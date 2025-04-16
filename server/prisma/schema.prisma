@@ -10,6 +10,110 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+// MySQL Models
+model Farmer {
+  id        Int       @id @default(autoincrement())
+  firstname String
+  lastname  String
+  email     String    @unique
+  password  String
+  phone     String    @db.VarChar(20)
+  isactive  Boolean   @default(true)
+  products  Product[]
+}
+
+model Buyer {
+  id        Int     @id @default(autoincrement())
+  firstname String
+  lastname  String
+  email     String  @unique
+  password  String
+  phone     String  @db.VarChar(20)
+  isactive  Boolean @default(true)
+}
+
+model Supplier {
+  id        Int     @id @default(autoincrement())
+  firstname String
+  lastname  String
+  email     String  @unique
+  password  String
+  phone     String  @db.VarChar(20)
+  isactive  Boolean @default(true)
+}
+
+enum ProductType {
+  FRUIT
+  VEGETABLE
+  GRAIN
+  LEGUME
+  TUBER
+  DAIRY
+  MEAT
+  POULTRY
+  OTHER
+}
+
+enum Unit {
+  KG
+  LITERS
+  BAGS
+  CRATES
+  BUNCHES
+  PIECES
+  OTHER
+}
+
+enum ProductStatus {
+  AVAILABLE
+  SOLD
+  PENDING
+  EXPIRED
+  RESERVED
+}
+
+model Product {
+  id           Int           @id @default(autoincrement())
+  name         String
+  type         ProductType
+  unit         Unit
+  priceperunit Int
+  quantity     Int
+  variety      String
+  perishdate   DateTime
+  location     String
+  status       ProductStatus
+  description  String
+  images       Json
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  farmerid     Int
+  farmerobj    Farmer        @relation(fields: [farmerid], references: [id])
+  reviews      Review[]
+}
+
+enum Rating {
+  ONE
+  TWO
+  THREE
+  FOUR
+  FIVE
+  SIX
+  SEVEN
+  EIGHT
+  NINE
+  TEN
+}
+
+model Review {
+  id         Int     @id @default(autoincrement())
+  userId     Int
+  rating     Rating
+  comment    String
+  productobj Product @relation(fields: [productid], references: [id])
+  productid  Int
 }

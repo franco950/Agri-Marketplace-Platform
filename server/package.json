@@ -7,12 +7,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc -w",
     "serve": "nodemon dist/index.js",
-    "server": "concurrently \"npm:watch\" \"npm:serve\""
+    "server": "concurrently --kill-others-on-fail --raw \"npm:watch\" \"npm:serve\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/node": "^22.14.1",
     "prisma": "^6.6.0",
@@ -21,6 +22,8 @@
   },
   "dependencies": {
     "@prisma/client": "^6.6.0",
-    "express": "^5.1.0"
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.9"
   }
 }
