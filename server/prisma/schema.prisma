@@ -24,6 +24,7 @@ model Farmer {
   phone     String    @db.VarChar(20)
   isactive  Boolean   @default(true)
   products  Product[]
+  Order     Order[]
 }
 
 model Buyer {
@@ -34,6 +35,7 @@ model Buyer {
   password  String
   phone     String  @db.VarChar(20)
   isactive  Boolean @default(true)
+  Order     Order[]
 }
 
 model Supplier {
@@ -44,6 +46,7 @@ model Supplier {
   password  String
   phone     String  @db.VarChar(20)
   isactive  Boolean @default(true)
+  Order     Order[]
 }
 
 enum ProductType {
@@ -77,23 +80,68 @@ enum ProductStatus {
 }
 
 model Product {
-  id           Int           @id @default(autoincrement())
-  name         String
-  type         ProductType
-  unit         Unit
-  priceperunit Int
-  quantity     Int
-  variety      String
-  perishdate   DateTime
-  location     String
-  status       ProductStatus
-  description  String
-  images       Json
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  farmerid     Int
-  farmerobj    Farmer        @relation(fields: [farmerid], references: [id])
-  reviews      Review[]
+  id                Int           @id @default(autoincrement())
+  name              String
+  type              ProductType
+  unit              Unit
+  priceperunit      Int
+  quantity          Int
+  variety           String
+  perishdate        DateTime
+  location          String
+  status            ProductStatus
+  description       String
+  images            Json
+  locationlatitude  Float         @default(0)
+  locationlongitude Float         @default(0)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  discount          Int           @default(0)
+  supplierthreshold Int           @default(0)
+  farmerdelivery    Boolean       @default(false)
+  servicedelivery   Boolean       @default(false)
+  farmerid          Int
+  farmerobj         Farmer        @relation(fields: [farmerid], references: [id])
+  reviews           Review[]
+  orders            Order[]
+}
+
+model Order {
+  id                Int          @id @default(autoincrement())
+  customertype      DeliveryType
+  buyerId           Int?
+  supplierId        Int?
+  buyer             Buyer?       @relation(fields: [buyerId], references: [id])
+  supplier          Supplier?    @relation(fields: [supplierId], references: [id])
+  productid         Int
+  productobj        Product      @relation(fields: [productid], references: [id])
+  farmerid          Int
+  farmerobj         Farmer       @relation(fields: [farmerid], references: [id])
+  deliverylatitude  Float
+  deliverylongitude Float
+  deliveryoption    Delivery
+  totalcost         Float
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  tracking          Tracking @default(PACKING)
+}
+
+enum DeliveryType {
+  BUYER
+  SUPPLIER
+}
+
+enum Tracking {
+  DELIVERED
+  ENROUTE
+  PACKING
+  PACKED
+}
+
+enum Delivery {
+  FARMER
+  SELF
+  SERVICE
 }
 
 enum Rating {
@@ -116,4 +164,35 @@ model Review {
   comment    String
   productobj Product @relation(fields: [productid], references: [id])
   productid  Int
+}
+model User{
+  id Int  @id 
+  firstname String
+  isactive Boolean
+  email String @unique
+  usertype Role
+}
+
+enum Role {
+  buyer
+  supplier
+  farmer
+  admin
+  worker
+}
+model Admin {
+  id        Int     @id @default(autoincrement())
+  firstname String
+  lastname  String
+  email     String  @unique
+  password  String
+  isactive  Boolean @default(true)
+}
+model Worker {
+  id        Int     @id @default(autoincrement())
+  firstname String
+  lastname  String
+  email     String  @unique
+  password  String
+  isactive  Boolean @default(true)
 }

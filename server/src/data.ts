@@ -43,7 +43,24 @@ export enum ProductType {
     TEN = "TEN"
   }
   
-  // Interfaces
+  export type Admin ={
+    id: number;
+    firstname: string;
+    lastname: string;
+    email: string;
+    password: string;
+    isactive: boolean;
+    
+  }
+  export type Worker ={
+    id: number;
+    firstname: string;
+    lastname: string;
+    email: string;
+    password: string;
+    isactive: boolean;
+    
+  }
   export type Farmer ={
     id: number;
     firstname: string;
@@ -73,6 +90,11 @@ export enum ProductType {
     password: string;
     phone: string;
     isactive: boolean;
+  }
+  export enum Delivery {
+    FARMER,
+    SELF,
+    SERVICE
   }
   
   export type Product ={

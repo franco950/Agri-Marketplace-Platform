@@ -160,9 +160,31 @@ exports.Prisma.ProductScalarFieldEnum = {
   status: 'status',
   description: 'description',
   images: 'images',
+  locationlatitude: 'locationlatitude',
+  locationlongitude: 'locationlongitude',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
+  discount: 'discount',
+  supplierthreshold: 'supplierthreshold',
+  farmerdelivery: 'farmerdelivery',
+  servicedelivery: 'servicedelivery',
   farmerid: 'farmerid'
+};
+
+exports.Prisma.OrderScalarFieldEnum = {
+  id: 'id',
+  customertype: 'customertype',
+  buyerId: 'buyerId',
+  supplierId: 'supplierId',
+  productid: 'productid',
+  farmerid: 'farmerid',
+  deliverylatitude: 'deliverylatitude',
+  deliverylongitude: 'deliverylongitude',
+  deliveryoption: 'deliveryoption',
+  totalcost: 'totalcost',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  tracking: 'tracking'
 };
 
 exports.Prisma.ReviewScalarFieldEnum = {
@@ -171,6 +193,32 @@ exports.Prisma.ReviewScalarFieldEnum = {
   rating: 'rating',
   comment: 'comment',
   productid: 'productid'
+};
+
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  firstname: 'firstname',
+  isactive: 'isactive',
+  email: 'email',
+  usertype: 'usertype'
+};
+
+exports.Prisma.AdminScalarFieldEnum = {
+  id: 'id',
+  firstname: 'firstname',
+  lastname: 'lastname',
+  email: 'email',
+  password: 'password',
+  isactive: 'isactive'
+};
+
+exports.Prisma.WorkerScalarFieldEnum = {
+  id: 'id',
+  firstname: 'firstname',
+  lastname: 'lastname',
+  email: 'email',
+  password: 'password',
+  isactive: 'isactive'
 };
 
 exports.Prisma.SortOrder = {
@@ -224,8 +272,32 @@ exports.Prisma.ProductOrderByRelevanceFieldEnum = {
   description: 'description'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 exports.Prisma.ReviewOrderByRelevanceFieldEnum = {
   comment: 'comment'
+};
+
+exports.Prisma.UserOrderByRelevanceFieldEnum = {
+  firstname: 'firstname',
+  email: 'email'
+};
+
+exports.Prisma.AdminOrderByRelevanceFieldEnum = {
+  firstname: 'firstname',
+  lastname: 'lastname',
+  email: 'email',
+  password: 'password'
+};
+
+exports.Prisma.WorkerOrderByRelevanceFieldEnum = {
+  firstname: 'firstname',
+  lastname: 'lastname',
+  email: 'email',
+  password: 'password'
 };
 exports.ProductType = exports.$Enums.ProductType = {
   FRUIT: 'FRUIT',
@@ -257,6 +329,24 @@ exports.ProductStatus = exports.$Enums.ProductStatus = {
   RESERVED: 'RESERVED'
 };
 
+exports.DeliveryType = exports.$Enums.DeliveryType = {
+  BUYER: 'BUYER',
+  SUPPLIER: 'SUPPLIER'
+};
+
+exports.Delivery = exports.$Enums.Delivery = {
+  FARMER: 'FARMER',
+  SELF: 'SELF',
+  SERVICE: 'SERVICE'
+};
+
+exports.Tracking = exports.$Enums.Tracking = {
+  DELIVERED: 'DELIVERED',
+  ENROUTE: 'ENROUTE',
+  PACKING: 'PACKING',
+  PACKED: 'PACKED'
+};
+
 exports.Rating = exports.$Enums.Rating = {
   ONE: 'ONE',
   TWO: 'TWO',
@@ -270,12 +360,24 @@ exports.Rating = exports.$Enums.Rating = {
   TEN: 'TEN'
 };
 
+exports.Role = exports.$Enums.Role = {
+  buyer: 'buyer',
+  supplier: 'supplier',
+  farmer: 'farmer',
+  admin: 'admin',
+  worker: 'worker'
+};
+
 exports.Prisma.ModelName = {
   Farmer: 'Farmer',
   Buyer: 'Buyer',
   Supplier: 'Supplier',
   Product: 'Product',
-  Review: 'Review'
+  Order: 'Order',
+  Review: 'Review',
+  User: 'User',
+  Admin: 'Admin',
+  Worker: 'Worker'
 };
 
 /**
