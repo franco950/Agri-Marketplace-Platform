@@ -176,7 +176,7 @@ app.get('/home',async(req: Request, res: Response)=>{
       await prisma.$disconnect();
     }
   });
-app.get('/product-types/:type',async(req: Request, res: Response)=>{
+app.get('/product-types/:type',checkAuth,async(req: Request, res: Response)=>{
     try{
       const paramvalue=req.params.type
       const  value= ProductType[paramvalue as keyof typeof ProductType];
@@ -191,7 +191,7 @@ app.get('/product-types/:type',async(req: Request, res: Response)=>{
       await prisma.$disconnect();
     }
   });
-  app.get('/products/:name',async(req: Request, res: Response)=>{
+  app.get('/products/:name',checkAuth,async(req: Request, res: Response)=>{
     try{
       const value=req.params.name
       const myproducts = await prisma.product.
@@ -205,7 +205,7 @@ app.get('/product-types/:type',async(req: Request, res: Response)=>{
       await prisma.$disconnect();
     }
   });
-app.get('/products/farmer',async(req: Request, res: Response)=>{
+app.get('/products/farmer',checkAuth,async(req: Request, res: Response)=>{
     try{
         const value=(req.user as User).id
         const myproducts = await prisma.product.
@@ -220,7 +220,7 @@ app.get('/products/farmer',async(req: Request, res: Response)=>{
     }
 });
 
-app.post('/products/farmer',async(req: Request, res: Response)=>{
+app.post('/products/farmer',checkAuth,async(req: Request, res: Response)=>{
     try{
         const values = req.body
         const myproducts = await prisma.product.create({ data: values });
@@ -233,7 +233,7 @@ app.post('/products/farmer',async(req: Request, res: Response)=>{
         await prisma.$disconnect();
     }
 });
-app.patch('/products/farmer',async(req: Request, res: Response)=>{
+app.patch('/products/farmer',checkAuth,async(req: Request, res: Response)=>{
     try{
         const values = req.body
         const productid=values.productid
@@ -247,7 +247,7 @@ app.patch('/products/farmer',async(req: Request, res: Response)=>{
         await prisma.$disconnect();
     }
 });
-app.post('/order',async(req: Request, res: Response)=>{
+app.post('/order',checkAuth,async(req: Request, res: Response)=>{
     try{
         const orderdetails=req.body
         const neworder= await prisma.order.create({ data: orderdetails});
@@ -260,7 +260,7 @@ app.post('/order',async(req: Request, res: Response)=>{
         await prisma.$disconnect();
     }
 });
-app.patch('/order/farmer',async(req: Request, res: Response)=>{
+app.patch('/order/farmer',checkAuth,async(req: Request, res: Response)=>{
   try{
       const orderdetails=req.body
       const farmerid=(req.user as User).id
@@ -275,7 +275,7 @@ app.patch('/order/farmer',async(req: Request, res: Response)=>{
       await prisma.$disconnect();
   }
 });
-app.get('/order/farmer',async(req:Request,res:Response)=>{
+app.get('/order/farmer',checkAuth,async(req:Request,res:Response)=>{
     try{
         const userid=(req.user as User).id
         const myorders=await prisma.order.findMany({where:{farmerid:userid}})
@@ -290,7 +290,7 @@ app.get('/order/farmer',async(req:Request,res:Response)=>{
         await prisma.$disconnect();
     }
 })
-app.get('/order/:client',async(req:Request,res:Response)=>{
+app.get('/order/:client',checkAuth,async(req:Request,res:Response)=>{
     try{
         const userid=(req.user as User).id
         const client=req.params.client
