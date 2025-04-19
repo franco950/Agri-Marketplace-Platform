@@ -45,7 +45,7 @@ async function Register(formData:Regform,
     else if (formData.password !== formData.confirmation){
         setMessage('Error: Passwords do not match');
         return
-    }
+    }console.log(formData.usertype)
     
     try{
         const submitdata={firstname:formData.firstname,lastname:formData.lastname,
@@ -63,7 +63,7 @@ async function Register(formData:Regform,
     const data = await response.json();
     if (response.status === 400) {
         //  already authenticated, redirect to home
-        setMessage( "email is already registered!")
+        setMessage( data.message)
         setFormData({firstname:'',lastname:'',usertype:usertypes.guest,phone:"",email:'',password:'',confirmation:''})
         return}
        

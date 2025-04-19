@@ -187,8 +187,35 @@
 //   }
   
 //   resetAllPasswords();
+///////////////////////////addusers
+// async function addProducts() {
+//     try {
+//       const allbuyers = await prisma.buyer.findMany();
+//       const allsuppliers=await prisma.supplier.findMany();
+//       const allfarmers=await prisma.farmer.findMany();
+//       if (!allsuppliers || !allbuyers || !allfarmers) {
+//         console.log("Products not created");
+//         return;
+//       } else {
+//         for (const single of allbuyers) {
+//           const { lastname, password, phone, ...newbuyer } = single;
+//           await prisma.user.create({
+//             data: {...newbuyer,usertype: 'buyer', },});}
+//         for (const single of allfarmers) {
+//           const { lastname, password, phone, ...newbuyer } = single;
+//           await prisma.user.create({
+//             data: {...newbuyer,usertype: 'farmer', },});}
+//         for (const single of allsuppliers) {
+//           const { lastname, password, phone, ...newbuyer } = single;
+//           await prisma.user.create({
+//             data: {...newbuyer,usertype: 'supplier', },});}
+//         console.log("Products created successfully");}
+//     } catch (error) {
+//       console.error("Error in addProducts function:", error);
+//     }
+//   }
   
-
+//   addProducts();
 
 
 // ..............................................................
@@ -414,3 +441,38 @@
 // app.listen(PORT, () => {
 //   console.log(`Server running on port ${PORT}`);
 // });
+
+// async function addbuyers() {
+//     try{
+//         const allbuyers = await prisma.buyer.createMany({data:buyersData})
+//         console.log(allbuyers)
+//         if (!allbuyers){console.log('buyers not created');return }
+//         else{
+//                 console.log(allbuyers)
+//             }
+//         }catch (error) {
+//             console.error("Error in addbuyers function:", error);
+//         }
+// }
+  
+//   addbuyers()
+
+  
+//   async function changeids() {
+//     try{
+//       const allfarmers = await prisma.farmer.findMany()
+//       const allbuyers = await Prisma.buyer.findMany()
+//       if (!allfarmers){console.log('farmers not created');return }
+//       if (!allbuyers){console.log('buyers not created');return }
+//       else{
+//           allfarmers.forEach(async single => {
+//               const hashedpassword=await bcrypt.hash(single.password,10)
+//               const newuser=await prisma.farmer.update({where:{id:single.id},data:farmersds})
+//               console.log(newuser)
+//             })}
+//       }catch (error) {
+//           console.error("Error in encryptfarmerpassword function:", error);
+//       }
+//   }
+  
+//   encryptfarmerpasswords()

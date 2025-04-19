@@ -231,6 +231,7 @@ exports.Prisma.JsonNullValueInput = {
 };
 
 exports.Prisma.FarmerOrderByRelevanceFieldEnum = {
+  id: 'id',
   firstname: 'firstname',
   lastname: 'lastname',
   email: 'email',
@@ -239,6 +240,7 @@ exports.Prisma.FarmerOrderByRelevanceFieldEnum = {
 };
 
 exports.Prisma.BuyerOrderByRelevanceFieldEnum = {
+  id: 'id',
   firstname: 'firstname',
   lastname: 'lastname',
   email: 'email',
@@ -247,6 +249,7 @@ exports.Prisma.BuyerOrderByRelevanceFieldEnum = {
 };
 
 exports.Prisma.SupplierOrderByRelevanceFieldEnum = {
+  id: 'id',
   firstname: 'firstname',
   lastname: 'lastname',
   email: 'email',
@@ -266,10 +269,12 @@ exports.Prisma.QueryMode = {
 };
 
 exports.Prisma.ProductOrderByRelevanceFieldEnum = {
+  id: 'id',
   name: 'name',
   variety: 'variety',
   location: 'location',
-  description: 'description'
+  description: 'description',
+  farmerid: 'farmerid'
 };
 
 exports.Prisma.NullsOrder = {
@@ -277,16 +282,29 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
+exports.Prisma.OrderOrderByRelevanceFieldEnum = {
+  id: 'id',
+  buyerId: 'buyerId',
+  supplierId: 'supplierId',
+  productid: 'productid',
+  farmerid: 'farmerid'
+};
+
 exports.Prisma.ReviewOrderByRelevanceFieldEnum = {
-  comment: 'comment'
+  id: 'id',
+  userId: 'userId',
+  comment: 'comment',
+  productid: 'productid'
 };
 
 exports.Prisma.UserOrderByRelevanceFieldEnum = {
+  id: 'id',
   firstname: 'firstname',
   email: 'email'
 };
 
 exports.Prisma.AdminOrderByRelevanceFieldEnum = {
+  id: 'id',
   firstname: 'firstname',
   lastname: 'lastname',
   email: 'email',
@@ -294,6 +312,7 @@ exports.Prisma.AdminOrderByRelevanceFieldEnum = {
 };
 
 exports.Prisma.WorkerOrderByRelevanceFieldEnum = {
+  id: 'id',
   firstname: 'firstname',
   lastname: 'lastname',
   email: 'email',

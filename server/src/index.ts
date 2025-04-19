@@ -7,9 +7,9 @@ import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 enum normaluser {
-  buyer,
-  supplier,
-  farmer
+  buyer='buyer',
+  supplier='supplier',
+  farmer='farmer'
   
 }
 type User=Buyer|Supplier|Farmer|Admin|Worker
@@ -54,7 +54,7 @@ async function findUserByEmail(email:string){
 
 }
     
-async function findById(id:number){
+async function findById(id:string){
     const myuser= await prisma.user.findUnique({where:{id:id} })
     if(myuser){
       const usertype=myuser.usertype
@@ -81,7 +81,7 @@ function initialize(passport:any){
     
   passport.use(new LocalStrategy({usernameField:'email'},authenticate))
   passport.serializeUser((user:any,done:any)=>{done(null,user.id)})
-  passport.deserializeUser(async(id:number,done:any)=>{
+  passport.deserializeUser(async(id:string,done:any)=>{
     try {
       const user = await findById(id);
       done(null, user);
@@ -125,16 +125,26 @@ app.post("/register",notAuth, async(req: Request, res: Response) => {
   }
   const hashedpassword=await bcrypt.hash(formdata.password,10)
   formdata.password=hashedpassword
-  const usertype:normaluser=formdata.usertype
+  const role:normaluser=formdata.usertype
+  const { lastname,password,phone, ...newform } = formdata;
+  const { usertype, ...form } = formdata;
   let userdata=null
-  if (usertype==normaluser.buyer){
-    userdata=await prisma.buyer.create({data:formdata})
+  
+  if (role==normaluser.buyer){
+    userdata=await prisma.buyer.create({data:form})
+    
   }
-  else if (usertype==normaluser.farmer){
-    userdata=await prisma.farmer.create({data:formdata})
+  else if (role==normaluser.farmer){
+    userdata=await prisma.farmer.create({data:form})
+    
   }
-  else if (usertype==normaluser.supplier){
-    userdata=await prisma.supplier.create({data:formdata})
+  else if (role==normaluser.supplier){
+    userdata=await prisma.supplier.create({data:form})
+    
+  }
+  if (userdata){
+    newform.id=userdata.id
+    await prisma.user.create({data:newform})
   }
 
   if (userdata!==null){

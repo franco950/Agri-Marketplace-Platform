@@ -16,7 +16,7 @@ datasource db {
 
 // MySQL Models
 model Farmer {
-  id        Int       @id @default(autoincrement())
+  id        String     @id @default(uuid())
   firstname String
   lastname  String
   email     String    @unique
@@ -28,7 +28,7 @@ model Farmer {
 }
 
 model Buyer {
-  id        Int     @id @default(autoincrement())
+  id        String     @id @default(uuid())
   firstname String
   lastname  String
   email     String  @unique
@@ -39,7 +39,7 @@ model Buyer {
 }
 
 model Supplier {
-  id        Int     @id @default(autoincrement())
+  id        String    @id  @default(uuid())
   firstname String
   lastname  String
   email     String  @unique
@@ -80,7 +80,7 @@ enum ProductStatus {
 }
 
 model Product {
-  id                Int           @id @default(autoincrement())
+  id        String    @id  @default(uuid())
   name              String
   type              ProductType
   unit              Unit
@@ -100,22 +100,22 @@ model Product {
   supplierthreshold Int           @default(0)
   farmerdelivery    Boolean       @default(false)
   servicedelivery   Boolean       @default(false)
-  farmerid          Int
+  farmerid          String
   farmerobj         Farmer        @relation(fields: [farmerid], references: [id])
   reviews           Review[]
   orders            Order[]
 }
 
 model Order {
-  id                Int          @id @default(autoincrement())
+  id        String    @id  @default(uuid())
   customertype      DeliveryType
-  buyerId           Int?
-  supplierId        Int?
+  buyerId           String?
+  supplierId        String?
   buyer             Buyer?       @relation(fields: [buyerId], references: [id])
   supplier          Supplier?    @relation(fields: [supplierId], references: [id])
-  productid         Int
+  productid         String
   productobj        Product      @relation(fields: [productid], references: [id])
-  farmerid          Int
+  farmerid          String
   farmerobj         Farmer       @relation(fields: [farmerid], references: [id])
   deliverylatitude  Float
   deliverylongitude Float
@@ -158,18 +158,18 @@ enum Rating {
 }
 
 model Review {
-  id         Int     @id @default(autoincrement())
-  userId     Int
+  id        String    @id  @default(uuid())
+  userId     String
   rating     Rating
   comment    String
   productobj Product @relation(fields: [productid], references: [id])
-  productid  Int
+  productid  String
 }
 model User{
-  id Int  @id 
+  id String  @unique
   firstname String
-  isactive Boolean
-  email String @unique
+  isactive Boolean @default(true)
+  email String @id 
   usertype Role
 }
 
@@ -181,7 +181,7 @@ enum Role {
   worker
 }
 model Admin {
-  id        Int     @id @default(autoincrement())
+  id        String    @id  @default(uuid())
   firstname String
   lastname  String
   email     String  @unique
@@ -189,7 +189,7 @@ model Admin {
   isactive  Boolean @default(true)
 }
 model Worker {
-  id        Int     @id @default(autoincrement())
+  id        String    @id  @default(uuid())
   firstname String
   lastname  String
   email     String  @unique
