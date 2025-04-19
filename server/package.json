@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc -w",
     "serve": "nodemon dist/index.js",
-    "server": "concurrently --kill-others-on-fail --raw \"npm:watch\" \"npm:serve\""
+    "server": "concurrently  \"npm:watch\" \"npm:serve\""
   },
   "keywords": [],
   "author": "",

@@ -176,7 +176,7 @@ app.get('/home',async(req: Request, res: Response)=>{
       await prisma.$disconnect();
     }
   });
-app.get('/product-types/:type',checkAuth,async(req: Request, res: Response)=>{
+app.get('/products/:type',checkAuth,async(req: Request, res: Response)=>{
     try{
       const paramvalue=req.params.type
       const  value= ProductType[paramvalue as keyof typeof ProductType];
@@ -314,4 +314,6 @@ app.get('/order/:client',checkAuth,async(req:Request,res:Response)=>{
         await prisma.$disconnect();
     }
 })
-console.log('server running')
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

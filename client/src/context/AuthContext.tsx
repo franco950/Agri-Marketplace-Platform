@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useEffect, useState, ReactNode } from "react";
 
 interface AuthContextType {
   isLoggedin: boolean;
@@ -8,7 +8,7 @@ interface AuthContextType {
   setIsLoggedin: (value: boolean) => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoggedin, setIsLoggedin] = useState(false);
@@ -60,8 +60,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 // Custom hook to use auth context
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within an AuthProvider");
-  return context;
-}
