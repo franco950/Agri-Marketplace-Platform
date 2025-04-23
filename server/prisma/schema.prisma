@@ -1,0 +1,198 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// MySQL Models
+model Farmer {
+  id        String     @id @default(uuid())
+  firstname String
+  lastname  String
+  email     String    @unique
+  password  String
+  phone     String    @db.VarChar(20)
+  isactive  Boolean   @default(true)
+  products  Product[]
+  Order     Order[]
+}
+
+model Buyer {
+  id        String     @id @default(uuid())
+  firstname String
+  lastname  String
+  email     String  @unique
+  password  String
+  phone     String  @db.VarChar(20)
+  isactive  Boolean @default(true)
+  Order     Order[]
+}
+
+model Supplier {
+  id        String    @id  @default(uuid())
+  firstname String
+  lastname  String
+  email     String  @unique
+  password  String
+  phone     String  @db.VarChar(20)
+  isactive  Boolean @default(true)
+  Order     Order[]
+}
+
+enum ProductType {
+  FRUIT
+  VEGETABLE
+  GRAIN
+  LEGUME
+  TUBER
+  DAIRY
+  MEAT
+  POULTRY
+  OTHER
+}
+
+enum Unit {
+  KG
+  LITERS
+  BAGS
+  CRATES
+  BUNCHES
+  PIECES
+  OTHER
+}
+
+enum ProductStatus {
+  AVAILABLE
+  SOLD
+  PENDING
+  EXPIRED
+  RESERVED
+}
+
+model Product {
+  id        String    @id  @default(uuid())
+  name              String
+  type              ProductType
+  unit              Unit
+  priceperunit      Int
+  quantity          Int
+  variety           String
+  perishdate        DateTime
+  location          String
+  status            ProductStatus
+  description       String
+  images            Json
+  locationlatitude  Float         @default(0)
+  locationlongitude Float         @default(0)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  discount          Int           @default(0)
+  supplierthreshold Int           @default(0)
+  farmerdelivery    Boolean       @default(false)
+  servicedelivery   Boolean       @default(false)
+  farmerid          String
+  farmerobj         Farmer        @relation(fields: [farmerid], references: [id])
+  reviews           Review[]
+  orders            Order[]
+}
+
+model Order {
+  id        String    @id  @default(uuid())
+  customertype      DeliveryType
+  buyerId           String?
+  supplierId        String?
+  buyer             Buyer?       @relation(fields: [buyerId], references: [id])
+  supplier          Supplier?    @relation(fields: [supplierId], references: [id])
+  productid         String
+  productobj        Product      @relation(fields: [productid], references: [id])
+  farmerid          String
+  farmerobj         Farmer       @relation(fields: [farmerid], references: [id])
+  deliverylatitude  Float
+  deliverylongitude Float
+  deliveryoption    Delivery
+  totalcost         Float
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  tracking          Tracking @default(PACKING)
+}
+
+enum DeliveryType {
+  BUYER
+  SUPPLIER
+}
+
+enum Tracking {
+  DELIVERED
+  ENROUTE
+  PACKING
+  PACKED
+}
+
+enum Delivery {
+  FARMER
+  SELF
+  SERVICE
+}
+
+enum Rating {
+  ONE
+  TWO
+  THREE
+  FOUR
+  FIVE
+  SIX
+  SEVEN
+  EIGHT
+  NINE
+  TEN
+}
+
+model Review {
+  id        String    @id  @default(uuid())
+  userId     String
+  rating     Rating
+  comment    String
+  productobj Product @relation(fields: [productid], references: [id])
+  productid  String
+}
+model User{
+  id String  @unique
+  firstname String
+  isactive Boolean @default(true)
+  email String @id 
+  usertype Role
+}
+
+enum Role {
+  buyer
+  supplier
+  farmer
+  admin
+  worker
+}
+model Admin {
+  id        String    @id  @default(uuid())
+  firstname String
+  lastname  String
+  email     String  @unique
+  password  String
+  isactive  Boolean @default(true)
+}
+model Worker {
+  id        String    @id  @default(uuid())
+  firstname String
+  lastname  String
+  email     String  @unique
+  password  String
+  isactive  Boolean @default(true)
+}
