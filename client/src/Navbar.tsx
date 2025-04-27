@@ -15,8 +15,9 @@ export default function Navbar() {
       
       {isLoggedin ? (
         <>
-        <button onClick={logout}>Logout</button>
-        <Link to="/profile"><button>profile</button></Link></>
+        <Link to="/profile">profile</Link>
+        <button onClick={logout}>Logout</button></>
+        
         
       ) : (
         <li className="sign-in"><Link to="/login">Sign in</Link></li>

@@ -2,6 +2,7 @@ import { Link,useNavigate } from 'react-router-dom';
  import React,{ useState } from "react";
  import { useAuth } from "./context/useauth";
  import { Navigate } from 'react-router-dom';
+ import './loginpage.css';
 
 type Loginform={
     email:string
@@ -12,7 +13,7 @@ async function login(formData:Loginform,
     setIsLoggedin: (value: boolean) => void  ,
     navigate: (path: string) => void){
    
-    
+    console.log(formData)
     if (!formData.email || !formData.password){
         setMessage('Error: Enter a valid username and password');
       return;}
@@ -56,6 +57,7 @@ function LoginPage(){
     const { isLoggedin, setIsLoggedin } = useAuth();
     
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        console.log('changed')
         setFormData({ ...formData, [event.target.name]: event.target.value });}
     
     if (isLoggedin){return  <Navigate to="/" />;}
@@ -63,14 +65,38 @@ function LoginPage(){
         await login(formData, setMessage, setIsLoggedin, navigate);
       };
     return(<>
-    <p>{message}</p>
-    <label >email</label>
-    <input type='email'name="email" value={formData.email}onChange={handleChange}></input>
-    <label>password</label>
-    <input type="password" name='password'value={formData.password}onChange={handleChange}></input>
-    <button type='submit' onClick={handleLogin}>login</button>
-    <Link to={`/register`} ><button>sign up</button></Link>
-    <Link to={`/`} ><button>proceed to homepage without login</button></Link>
+
+    <div className="login-page">
+      <div className="login-card">
+        <h1 className="login-title">Welcome Back</h1>
+        <p className="login-subtitle">Log in to continue</p>
+        
+        <div className="login-form">
+          <div className="form-group">
+          <p>{message}</p>
+            <label>Email</label>
+            <input type='email'name="email" value={formData.email}onChange={handleChange}></input>
+          </div>
+          <div className="form-group">
+            <label>Password</label>
+            <input type="password" name='password'value={formData.password}onChange={handleChange}></input>
+          </div>
+          <button className="login-button" onClick={handleLogin}>login</button>
+          
+          
+          <div className="login-links">
+            <a href="#">Forgot password?</a>
+          </div>
+          
+          <div className="divider"></div>
+          
+          <p className="signup-text">
+            Don't have an account? <Link to={`/register`} ><button>sign up</button></Link>
+          </p>
+          <Link to={`/`} className='signup-text'>proceed to homepage without login</Link>
+        </div>
+      </div>
+    </div>
     </>)
 }
 

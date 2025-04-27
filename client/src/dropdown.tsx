@@ -4,6 +4,7 @@ export  enum usertypes{
     farmer='farmer',
     supplier='supplier',
     guest='guest'
+    
  }
 interface DropdownProps {
   value: usertypes;
@@ -12,7 +13,7 @@ interface DropdownProps {
 
 const Dropdown = ({ value, onChange }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const options = Object.values(usertypes); 
+  const options = Object.values(usertypes).filter(type => type !== usertypes.guest);
 
   const handleSelect = (option: usertypes) => {
     onChange(option); // Pass selection to parent
