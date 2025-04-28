@@ -16,7 +16,7 @@ const Dropdown = ({ value, onChange }: DropdownProps) => {
   const options = Object.values(usertypes).filter(type => type !== usertypes.guest);
 
   const handleSelect = (option: usertypes) => {
-    onChange(option); // Pass selection to parent
+    onChange(option); 
     setIsOpen(false);
   };
 

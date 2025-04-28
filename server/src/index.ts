@@ -114,51 +114,51 @@ app.post("/login",notAuth, (req: Request, res: Response,next) => {
 
 app.post("/register",notAuth, async(req: Request, res: Response) => {
   try{
-  const formdata=req.body
-  const existingUser = await prisma.user.findUnique({
-    where:{ email: formdata.email },
-  });
+    const formdata=req.body
+    const existingUser = await prisma.user.findUnique({
+      where:{ email: formdata.email },
+    });
 
-  if (existingUser) {
-     res.status(400).json({ error: "Email already exists. Please log in or use another email." });
-     return
-  }
-  const hashedpassword=await bcrypt.hash(formdata.password,10)
-  formdata.password=hashedpassword
-  const role:normaluser=formdata.usertype
-  const { lastname,password,phone, ...newform } = formdata;
-  const { usertype, ...form } = formdata;
-  let userdata=null
+    if (existingUser) {
+      res.status(400).json({ error: "Email already exists. Please log in or use another email." });
+      return
+      }
+    const hashedpassword=await bcrypt.hash(formdata.password,10)
+    formdata.password=hashedpassword
+    const role:normaluser=formdata.usertype
+    const { lastname,password,phone, ...newform } = formdata;
+    const { usertype, ...form } = formdata;
+    let userdata=null
   
-  if (role==normaluser.buyer){
-    userdata=await prisma.buyer.create({data:form})
-    
-  }
-  else if (role==normaluser.farmer){
-    userdata=await prisma.farmer.create({data:form})
-    
-  }
-  else if (role==normaluser.supplier){
-    userdata=await prisma.supplier.create({data:form})
-    
-  }
-  if (userdata){
-    newform.id=userdata.id
-    await prisma.user.create({data:newform})
-  }
+    if (role==normaluser.buyer){
+      userdata=await prisma.buyer.create({data:form})
+      
+    }
+    else if (role==normaluser.farmer){
+      userdata=await prisma.farmer.create({data:form})
+      
+    }
+    else if (role==normaluser.supplier){
+      userdata=await prisma.supplier.create({data:form})
+      
+    }
+    if (userdata){
+      newform.id=userdata.id
+      await prisma.user.create({data:newform})
+    }
 
-  if (userdata!==null){
-  res.status(201).json({message:`success,account created for:${userdata.firstname}`});
-   return}
-  else{res.status(400).json({message:'bad request'}); return}}
-  catch(error){
-    if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
-      res.status(400).json({ error: "Email already exists. Please use a different one." });
+    if (userdata!==null){
+    res.status(201).json({message:`success,account created for:${userdata.firstname}`});
     return}
-    console.error("server error in registration:",error);
-     res.status(500).json({message:"Internal server error"});
-  }finally {
-    await prisma.$disconnect();
+    else{res.status(400).json({message:'bad request'}); return}}
+    catch(error){
+      if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
+        res.status(400).json({ error: "Email already exists. Please use a different one." });
+      return}
+      console.error("server error in registration:",error);
+      res.status(500).json({message:"Internal server error"});
+    }finally {
+      await prisma.$disconnect();
   }
 });
 app.delete("/logout", (req: Request, res: Response, next) => {
@@ -174,11 +174,50 @@ app.get("/auth-status", (req, res) => {
     username: req.isAuthenticated() ? (req.user as User).firstname : null
   });
 });
+const buildProductFilter = (input: {
+  name?: string;
+  type?: string;
+  location?: string;
+  status?:ProductStatus;
+  minPrice?: number;
+  maxPrice?: number;
+}) => {
+  const where: any = {};  
+
+  if (input.name) {
+    where.name = { contains: input.name, mode: 'insensitive' };
+  }
+
+  if (input.type) {
+    where.type = { equals: input.type };
+  }
+
+  if (input.minPrice !== undefined) {
+    where.priceperunit = { ...(where.priceperunit || {}), gte: input.minPrice };
+  }
+
+  if (input.maxPrice !== undefined) {
+    where.priceperunit = { ...(where.priceperunit || {}), lte: input.maxPrice };
+  }
+
+  if (input.location) {
+    where.location = { equals: input.location };
+  }
+  if (input.status) {
+    where.status= { equals: input.status };
+  }
+
+  return where;
+};
 
 app.get('/home',async(req: Request, res: Response)=>{
     try{
-      res.json({ProductType});
-      console.log('product types sent')
+      const myproducts = await prisma.product.findMany({select:{type:true,location:true,name:true}});
+      const types = [...new Set(myproducts.map(item => item.type))];
+      const locations = [...new Set(myproducts.map(item => item.location))];
+      const names = [...new Set(myproducts.map(item => item.name))];
+      res.json({locations,types,names});
+      console.log('homedata sent')
     }catch(error){
       console.error("Error in /home",error);
       res.status(500).json({message:"Internal server error"});
@@ -186,35 +225,28 @@ app.get('/home',async(req: Request, res: Response)=>{
       await prisma.$disconnect();
     }
   });
-app.get('/products/:type',checkAuth,async(req: Request, res: Response)=>{
-    try{
-      const paramvalue=req.params.type
-      const  value= ProductType[paramvalue as keyof typeof ProductType];
-      const myproducts = await prisma.product.
-      findMany({ where: { type: value }, select:{name:true} });
-      res.json({myproducts});
-      console.log('products sent')
-    }catch(error){
-      console.error("Error in /products",error);
-      res.status(500).json({message:"Internal server error"});
-    }finally {
-      await prisma.$disconnect();
-    }
-  });
-  app.get('/products/:name',checkAuth,async(req: Request, res: Response)=>{
-    try{
-      const value=req.params.name
-      const myproducts = await prisma.product.
-      findMany({ where: { name: value },include: { reviews: true },  });
-      res.json({myproducts,Delivery});
-      console.log('products sent')
-    }catch(error){
-      console.error("Error in /products",error);
-      res.status(500).json({message:"Internal server error"});
-    }finally {
-      await prisma.$disconnect();
-    }
-  });
+app.get('/product',async(req: Request, res: Response)=>{
+  try{
+    const filters = buildProductFilter(req.query);
+    console.log(filters)
+    const myproducts = await prisma.product.findMany({
+      where: {
+        ...(filters.name && { name: filters.name }),
+        ...(filters.type && {type: filters.type }),
+        ...(filters.location && { location: filters.location }),
+      }});
+      console.log(myproducts)
+    res.json({myproducts});
+    console.log('product types sent')
+  }catch(error){
+    console.error("Error in /products",error);
+    res.status(500).json({message:"Internal server error"});
+  }finally {
+    await prisma.$disconnect();
+  }
+});
+
+
 app.get('/products/farmer',checkAuth,async(req: Request, res: Response)=>{
     try{
         const value=(req.user as User).id
