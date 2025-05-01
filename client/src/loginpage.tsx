@@ -13,7 +13,7 @@ async function login(formData:Loginform,
     setIsLoggedin: (value: boolean) => void  ,
     navigate: (path: string) => void){
    
-    console.log(formData)
+
     if (!formData.email || !formData.password){
         setMessage('Error: Enter a valid username and password');
       return;}

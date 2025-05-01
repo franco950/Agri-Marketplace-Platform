@@ -100,6 +100,9 @@ function notAuth(req:Request,res:Response,next:any){
     return res.status(403).json({ message: "Already logged in." });}
   return next()
 }
+function capitalizeFirstLetter(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
 app.post("/login",notAuth, (req: Request, res: Response,next) => {
   passport.authenticate('local',(err:any, user:any) => {
     if (err) return next(err);
@@ -185,7 +188,8 @@ const buildProductFilter = (input: {
   const where: any = {};  
 
   if (input.name) {
-    where.name = { contains: input.name, mode: 'insensitive' };
+   
+    where.name = { contains: input.name };
   }
 
   if (input.type) {
@@ -227,16 +231,28 @@ app.get('/home',async(req: Request, res: Response)=>{
   });
 app.get('/product',async(req: Request, res: Response)=>{
   try{
+    let myproducts=[]
+    let result;
+    if (req.query){
     const filters = buildProductFilter(req.query);
-    console.log(filters)
-    const myproducts = await prisma.product.findMany({
+
+    myproducts = await prisma.product.findMany({
       where: {
-        ...(filters.name && { name: filters.name }),
+        ...(filters.name && { name: filters.name}),
         ...(filters.type && {type: filters.type }),
         ...(filters.location && { location: filters.location }),
       }});
-      console.log(myproducts)
-    res.json({myproducts});
+      
+      if (myproducts.length!=0){
+        result='search'
+        res.json({myproducts,result})}}
+
+      if (!req.query || myproducts.length==0) {
+        const myproducts=await prisma.product.findMany()
+        result='all'
+        res.json({myproducts,result})
+      }
+    ;
     console.log('product types sent')
   }catch(error){
     console.error("Error in /products",error);

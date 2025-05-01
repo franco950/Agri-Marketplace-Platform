@@ -1,6 +1,6 @@
 import { useState,useEffect } from 'react';
 import Navbar from './Navbar';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 async function getHomeData(setMessage: React.Dispatch<React.SetStateAction<string>>,
   setProducts: React.Dispatch<React.SetStateAction<any>>){
@@ -26,7 +26,7 @@ async function getHomeData(setMessage: React.Dispatch<React.SetStateAction<strin
       setMessage(error.message || "Error  retrieving products");} 
 }
 
-type searchParams={
+export type searchParams={
   name?:string;
   location?:string;
   type?:string;
@@ -41,7 +41,11 @@ function Homepage(){
   }, []);
   const types = products?.types || [];
   const locations = products?.locations || [];
-  const names=products?.names || [];
+  const uppernames=products?.names || [];
+  const names:string[]=uppernames.map((name: string) => name.toLowerCase());
+
+  
+
 
   function mapstuff(stuff:any[]){
     if (!stuff || stuff.length === 0) return null;
@@ -85,7 +89,7 @@ function Homepage(){
     
     else if (searchParams.location || searchParams.name ||searchParams.type){ 
       const queryString = new URLSearchParams(filteredParams as Record<string, string>).toString();
-      navigate(`/products?${queryString}`);}
+      navigate(`/product?${queryString}`);}
   }
     return (<>
     <div className='hero'>
@@ -97,7 +101,7 @@ function Homepage(){
           Source fresh produce and grains directly from local farms.<br />
           Connecting buyers and farmers for fair, transparent trade.
         </p>
-        <a href="#" className="explore-btn">Explore Marketplace</a>
+        <Link to={'/product'} className="explore-btn">Explore Marketplace</Link>
       </div>
       <p className='message'>{message}</p>
       <div className="search-box">
