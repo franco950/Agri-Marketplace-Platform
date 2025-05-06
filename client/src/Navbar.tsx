@@ -7,7 +7,7 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <div className="logo">AgriMarket</div>
+      <div className="logo">AgriGo</div>
       <ul className="nav-links">
         <li><Link to="/">Home</Link></li>
         <li><a href="/about">About</a></li>

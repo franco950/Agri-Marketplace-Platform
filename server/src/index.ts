@@ -178,6 +178,7 @@ app.get("/auth-status", (req, res) => {
   });
 });
 const buildProductFilter = (input: {
+  id?:string;
   name?: string;
   type?: string;
   location?: string;
@@ -186,7 +187,10 @@ const buildProductFilter = (input: {
   maxPrice?: number;
 }) => {
   const where: any = {};  
-
+  if (input.id) {
+   
+    where.id = { contains: input.id };
+  }
   if (input.name) {
    
     where.name = { contains: input.name };
@@ -234,20 +238,25 @@ app.get('/product',async(req: Request, res: Response)=>{
     let myproducts=[]
     let result;
     if (req.query){
+      console.log(req.query)
     const filters = buildProductFilter(req.query);
+    console.log(filters.id)
 
     myproducts = await prisma.product.findMany({
       where: {
+        ...(filters.id && { id: filters.id}),
         ...(filters.name && { name: filters.name}),
         ...(filters.type && {type: filters.type }),
         ...(filters.location && { location: filters.location }),
-      }});
+      },include:{farmerobj:true,reviews:true}});
       
       if (myproducts.length!=0){
         result='search'
+        console.log('query returned')
         res.json({myproducts,result})}}
 
       if (!req.query || myproducts.length==0) {
+        console.log('query is empty')
         const myproducts=await prisma.product.findMany()
         result='all'
         res.json({myproducts,result})

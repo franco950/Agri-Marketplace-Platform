@@ -1,84 +1,116 @@
-import { Link, useSearchParams } from "react-router-dom";
-import { useState,useEffect } from 'react';
-import { searchParams } from "./homepage";
+import { Link, useNavigate,useSearchParams } from "react-router-dom";
+import { getProductData } from "./api/getproducts";
 import { useQuery } from '@tanstack/react-query';
-import './products.css'
-
-async function getProductData(params:searchParams){
-    try{
-        const filteredParams = Object.fromEntries(
-            Object.entries(params).filter(([_, value]) => value !== '')
-        );
-        const allParamsEmpty = Object.keys(filteredParams).length === 0;
-        let query;
-    if (allParamsEmpty){
-        query=`http://localhost:5000/product`
+import { Product,ProductType } from "./data";
+import "./products.css"
+import Navbar from "./Navbar";
+import React from 'react';
+import { capitalizeFirstLetter } from "./utils/general";
+  
+  type Props = {
+    products: Product[];
+  };
+  
+  const readableProductType = (type: ProductType): string =>
+    type.charAt(0) + type.slice(1).toLowerCase();
+  
+  const extractImage = (images: any): string => {
+    try {
+      const parsed = typeof images === 'string' ? JSON.parse(images) : images;
+      return Array.isArray(parsed) ? parsed[0] : '';
+    } catch (err) {
+      console.error('Failed to parse product image JSON:', err);
+      return '';
     }
-    else{
-        const queryString = '?'+new URLSearchParams(filteredParams as Record<string, string>).toString();
-        query=`http://localhost:5000/product${queryString}`
-    }
-    const response=await fetch(query,{
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json", 
-        },
-        credentials: "include",
-    
-    })
-    const {myproducts,result} = await response.json(); 
-    if (!response.ok) { 
-        const error = await response.json();
-        throw new Error(error.message || "Request failed")};
-    if (!allParamsEmpty && result=='all'){
-        throw new Error('no products found')}
-    return myproducts}
-    
-    
-    catch(error:any) {
-        console.error("Error retrieving products:", error);
-        throw new Error(error)} 
-  }
-  function capitalizeFirstLetter(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-  }
-
-function ProductPage(){
-    const [searchParams] = useSearchParams()||'';
-    const type = searchParams.get('type')|| '';
-    const uppername = searchParams.get('name')|| '';
-    const name=capitalizeFirstLetter(uppername)
-    const location = searchParams.get('location')|| '';
-    const queryParams = { name, type, location };
+  };
+  
+  const CategoryProductList: React.FC<Props> = ({ products }) => {
+    const categories = Object.values(ProductType);
+    const navigate=useNavigate()
+    function handleSearch(id:string){
+      const params={id:id}
+      const queryString = new URLSearchParams(params as Record<string, string>).toString();
+      navigate(`/productdetails?${queryString}`);}
+  
+    return (
+      <div className="app">
+        <h1>Products</h1>
+        <Link to="/product" className="browse-link">Browse All</Link>
+  
+        {categories.map((category) => {
+          const filtered = products.filter((p) => p.type === category);
+          if (filtered.length === 0) return null;
+  
+          return (
+            <div className="category" key={category}>
+              <h2>{readableProductType(category)}</h2>
+              <div className="card-container">
+                {filtered.map((product) => {
+                  const imageUrl = extractImage(product.images);
+                  return (
+                    <div className="card" key={product.id}onClick={()=>handleSearch(product.id)}>
+                      {imageUrl && (
+                        <img
+                          src={imageUrl}
+                          alt={product.name}
+                          style={{ width: '100%',height:'50%', borderRadius: '8px' }}
+                        />
+                      )}
+                      <h3>{product.name}</h3>
+                      <p>{product.variety}</p>
+                      <p>
+                        {product.quantity} {product.unit}
+                      </p>
+                      <p style={{ color: '#4CAF50' }}>
+                        Ksh {product.priceperunit.toLocaleString()}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+  export default function ProductPage() {
+    const [searchParams] = useSearchParams();
+    const type = searchParams.get('type') || '';
+    const uppername = searchParams.get('name') || '';
+    const name = capitalizeFirstLetter(uppername);
+    const location = searchParams.get('location') || '';
+    const id = searchParams.get('id') || '';
+    const queryParams = { name, type, location,id };
     
    
+  
     const {
-        data: products,
-        isLoading,
-        error,
-      } = useQuery({
-        queryKey: ['products', queryParams], // Key includes params so cache is managed correctly
-        queryFn: () => getProductData(queryParams),
-        staleTime: 1000 * 60 * 5, // Optional: 5 minutes
-      });
-    
-      if (isLoading) return <p>Loading...</p>;
-      if (error instanceof Error) return <p>{error.message}</p>;
-    
-
-
+      data: products,
+      isLoading,
+      error,
+    } = useQuery({
+      queryKey: ['products', queryParams],
+      queryFn: () => getProductData(queryParams),
+      staleTime: 1000 * 60 * 5,
+    });
+  
+    if (isLoading) return <p>Loading...</p>;
+    if (error instanceof Error) return <p>{error.message}</p>;
+    if (!products) return <p>No products to display</p>;
+  
+    return (
+      <div className="full-container">
+        <Navbar />
+        <CategoryProductList products={products} />
+      </div>
+    );
+  }
       
-    
+      
 
-    return(<>
-    <Link to={'/product'}>browse all</Link>
-    <>
-      <h1>Products</h1>
-      {products.map((product:any) => (
-        <div key={product.id}>{product.name}</div>
-      ))}
-    </>
-   
-   </>)
-}
-export default ProductPage
+
+
+
+
+
