@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "./context/useauth";
+import { useCart } from "./cart";
 
 export default function Navbar() {
-  const { isLoggedin, logout } = useAuth();
- 
+  let { userid,isLoggedin, logout } = useAuth();
+  let {total,cart}=useCart(userid)
 
   return (
     <nav className="navbar">
@@ -15,9 +16,11 @@ export default function Navbar() {
       
       {isLoggedin ? (
         <>
+        <div>
+        {total}<>{cart}</>
+        <button className="cart-logo"></button></div>
         <Link to="/profile">profile</Link>
         <button onClick={logout}>Logout</button></>
-        
         
       ) : (
         <li className="sign-in"><Link to="/login">Sign in</Link></li>

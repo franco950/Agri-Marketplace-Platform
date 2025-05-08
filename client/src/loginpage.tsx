@@ -57,7 +57,7 @@ function LoginPage(){
     const { isLoggedin, setIsLoggedin } = useAuth();
     
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log('changed')
+        
         setFormData({ ...formData, [event.target.name]: event.target.value });}
     
     if (isLoggedin){return  <Navigate to="/" />;}

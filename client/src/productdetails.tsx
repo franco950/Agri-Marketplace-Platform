@@ -2,19 +2,34 @@
 import React from 'react';
 import './ProductDetail.css';
 import { Product } from './data';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams,useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getSingleProduct } from './api/getproducts';
 import { capitalizeFirstLetter } from './utils/general';
+import Navbar from './Navbar';
+import { useCart } from './cart';
+import { useAuth } from './context/useauth';
+
+
 
 type Props = {
   product: Product;
 };
 
 const ProductDetail: React.FC<Props> = ({ product }) => {
+  let { userid } = useAuth();
+  
+  const {addToCart,cart,total}=useCart(userid)
+  const navigate=useNavigate()
   const images = Array.isArray(product.images) ? product.images : [];
   const imageUrl = images.length > 0 ? images[0] : '/placeholder.jpg';
-
+  const quantity=1
+  function handleOrder(productid:string,quantity:number){
+    addToCart(productid,quantity)
+    navigate(`/order/${productid}`)
+  }
+  console.log(cart)
+  console.log(total)
   return (
     <div className="product-detail-container">
       <div className="product-detail-grid">
@@ -25,6 +40,11 @@ const ProductDetail: React.FC<Props> = ({ product }) => {
               <img src={img} alt={`thumb-${index}`} key={index} className="thumbnail" />
             ))}
           </div>
+          <div className="button-row">
+  <button className="buy-now" onClick={()=>handleOrder(product.id,quantity)}>Buy{total}</button>
+  <button className="add-to-cart"onClick={()=>addToCart(product.id,quantity)}>Add to cart</button>
+</div>
+
         </div>
 
         <div className="product-info-section">
@@ -98,6 +118,10 @@ export default function ProductDetailPage() {
     
     if (!product) return <p>Product not found.</p>;
   
-    return <ProductDetail product={product} />;
+    return (<div className="full-container">
+    <Navbar/>
+    <ProductDetail product={product} />
+    </div>)
+    
   }
 

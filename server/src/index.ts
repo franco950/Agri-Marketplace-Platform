@@ -174,6 +174,7 @@ app.delete("/logout", (req: Request, res: Response, next) => {
 app.get("/auth-status", (req, res) => {
   res.json({
     isLoggedin: req.isAuthenticated(),
+    id: req.isAuthenticated() ? (req.user as User).id : null,
     username: req.isAuthenticated() ? (req.user as User).firstname : null
   });
 });
@@ -238,9 +239,7 @@ app.get('/product',async(req: Request, res: Response)=>{
     let myproducts=[]
     let result;
     if (req.query){
-      console.log(req.query)
     const filters = buildProductFilter(req.query);
-    console.log(filters.id)
 
     myproducts = await prisma.product.findMany({
       where: {
@@ -252,11 +251,10 @@ app.get('/product',async(req: Request, res: Response)=>{
       
       if (myproducts.length!=0){
         result='search'
-        console.log('query returned')
         res.json({myproducts,result})}}
 
       if (!req.query || myproducts.length==0) {
-        console.log('query is empty')
+     
         const myproducts=await prisma.product.findMany()
         result='all'
         res.json({myproducts,result})

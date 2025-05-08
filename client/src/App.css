@@ -42,6 +42,9 @@
   color:antiquewhite
 }
 .navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
   width: 100%;
   display: flex;
   margin:0;
@@ -51,6 +54,7 @@
   color: white;
   align-items: center;
   border-radius: 10px 10px 0 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
@@ -149,4 +153,12 @@
 
 .search-btn:hover {
   background-color: #b58b00;
+}
+.cart-logo{
+  color: wheat;
+  background-image: url('./shopping.png');
+  background-size:25px; 
+  background-color: rgba(94, 60, 30, 0.9);;
+  background-repeat: no-repeat;
+  
 }

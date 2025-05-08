@@ -98,7 +98,7 @@ import { capitalizeFirstLetter } from "./utils/general";
     if (isLoading) return <p>Loading...</p>;
     if (error instanceof Error) return <p>{error.message}</p>;
     if (!products) return <p>No products to display</p>;
-  
+    
     return (
       <div className="full-container">
         <Navbar />
