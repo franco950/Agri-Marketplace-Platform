@@ -7,8 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getSingleProduct } from './api/getproducts';
 import { capitalizeFirstLetter } from './utils/general';
 import Navbar from './Navbar';
-import { useCart } from './cart';
-import { useAuth } from './context/useauth';
+import { useCartContext } from './cart';
 
 
 
@@ -17,9 +16,7 @@ type Props = {
 };
 
 const ProductDetail: React.FC<Props> = ({ product }) => {
-  let { userid } = useAuth();
-  
-  const {addToCart,cart,total}=useCart(userid)
+  const {addToCart,cart,total}=useCartContext()
   const navigate=useNavigate()
   const images = Array.isArray(product.images) ? product.images : [];
   const imageUrl = images.length > 0 ? images[0] : '/placeholder.jpg';

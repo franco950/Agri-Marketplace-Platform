@@ -9,10 +9,12 @@ import OrderPage from "./orderpage"
 import TrackingPage from './trackingpage';
 import ProfilePage from './profilepage';
 import ProductDetail from './productdetails';
+import { CartProvider } from './cart'
 
 function App(){
   return(<>
   <AuthProvider>
+  <CartProvider>
   <Router>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
@@ -25,6 +27,7 @@ function App(){
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       </Routes>
     </Router>
+    </CartProvider>
     </AuthProvider>
     
   

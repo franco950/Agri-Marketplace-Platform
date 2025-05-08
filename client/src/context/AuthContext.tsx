@@ -63,5 +63,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     </AuthContext.Provider>
   );
 }
-
-// Custom hook to use auth context
