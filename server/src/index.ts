@@ -269,6 +269,31 @@ app.get('/product',async(req: Request, res: Response)=>{
   }
 });
 
+app.post('/product/checkout',checkAuth,async(req: Request, res: Response)=>{
+
+  try{
+      const value=(req.user as User).id
+      const productIds:string[]=req.body
+
+      const myproducts = await Promise.all(
+        productIds.map(id =>
+          prisma.product.findUnique({ where: { id } })
+        )
+      );
+      const validProducts = myproducts.filter(p => p !== null);
+      if(validProducts.length==0){
+        res.status(404).json({message:'no products found'})
+      }
+      res.json(validProducts);
+      
+      console.log('checkout products sent')
+  }catch(error){
+      console.error("Error in /products retrieval",error);
+      res.status(500).json({message:"Internal server error"});
+  }finally {
+      await prisma.$disconnect();
+  }
+});
 
 app.get('/products/farmer',checkAuth,async(req: Request, res: Response)=>{
     try{

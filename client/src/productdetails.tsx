@@ -1,5 +1,5 @@
 // ProductDetail.tsx
-import React from 'react';
+import React,{ useState } from 'react';
 import './ProductDetail.css';
 import { Product } from './data';
 import { useSearchParams,useNavigate } from 'react-router-dom';
@@ -9,24 +9,38 @@ import { capitalizeFirstLetter } from './utils/general';
 import Navbar from './Navbar';
 import { useCartContext } from './cart';
 
-
-
 type Props = {
   product: Product;
 };
+function QuantityInput({ value, onChange }: { value: number, onChange: (val: number) => void }) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value, 10);
+    if (!isNaN(val)) onChange(val);
+  };
+
+  return (
+    <input
+      type="number"
+      min={1}
+      value={value}
+      onChange={handleChange}
+      style={{ width: '50px', padding: '5px' }}
+    />
+  );
+}
 
 const ProductDetail: React.FC<Props> = ({ product }) => {
-  const {addToCart,cart,total}=useCartContext()
+  const [quantity, setQuantity] = useState(1);
+  const {addToCart}=useCartContext()
   const navigate=useNavigate()
   const images = Array.isArray(product.images) ? product.images : [];
   const imageUrl = images.length > 0 ? images[0] : '/placeholder.jpg';
-  const quantity=1
+
   function handleOrder(productid:string,quantity:number){
     addToCart(productid,quantity)
     navigate(`/order/${productid}`)
   }
-  console.log(cart)
-  console.log(total)
+
   return (
     <div className="product-detail-container">
       <div className="product-detail-grid">
@@ -38,7 +52,9 @@ const ProductDetail: React.FC<Props> = ({ product }) => {
             ))}
           </div>
           <div className="button-row">
-  <button className="buy-now" onClick={()=>handleOrder(product.id,quantity)}>Buy{total}</button>
+  <button className="buy-now" onClick={()=>handleOrder(product.id,quantity)}>Buy</button>
+  
+  <QuantityInput value={quantity} onChange={setQuantity} />
   <button className="add-to-cart"onClick={()=>addToCart(product.id,quantity)}>Add to cart</button>
 </div>
 

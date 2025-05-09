@@ -70,3 +70,31 @@ export async function getProductData(params:searchParams):Promise<Product[]>{
         console.error("Error retrieving products:", error);
         throw new Error(error)} 
   }
+  export async function getCartProducts(productIds:string[]):Promise<Product[]>{
+    try{
+        
+    const query=`http://localhost:5000/product/checkout`
+
+    
+    const response=await fetch(query,{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", 
+        },
+        credentials: "include",
+        body: JSON.stringify(productIds)
+    
+    
+    })
+    const myproducts = await response.json(); 
+    console.log(myproducts)
+    if (!response.ok) { 
+        const error = await response.json();
+        throw new Error(error.message || "Request failed")};
+   
+    return myproducts||[]}
+
+    catch(error:any) {
+        console.error("Error retrieving products:", error);
+        throw new Error(error)} 
+  }

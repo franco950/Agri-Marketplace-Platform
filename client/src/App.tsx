@@ -22,8 +22,8 @@ function App(){
         <Route path="/" element={<HomePage />} />
         <Route path="/product" element={<ProtectedRoute><ProductPage /></ProtectedRoute>} />
         <Route path="/productdetails" element={<ProtectedRoute><ProductDetail /></ProtectedRoute>} />
-        <Route path="/order" element={<ProtectedRoute><OrderPage /></ProtectedRoute>} />
-        <Route path="/tracking" element={<ProtectedRoute><TrackingPage /></ProtectedRoute>} />
+        <Route path="/order/:id" element={<ProtectedRoute><OrderPage /></ProtectedRoute>} />
+        <Route path="/tracking/:id" element={<ProtectedRoute><TrackingPage /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       </Routes>
     </Router>

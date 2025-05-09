@@ -56,9 +56,11 @@ export function useCart(userId: string) {
       return prevCart.map((userCart) => { 
         if (userCart.userid !== userId) 
           return userCart; 
+        
         const itemExists = userCart.items.some((item) => item.productid === productid); 
         const updatedItems = itemExists ? userCart.items.map((item) => item.productid === productid ? { 
-          ... item, quantity: item.quantity + quantity } : item ) : [... userCart.items, { productid, quantity }]; 
+          
+          ... item,  quantity: Math.max(0, item.quantity + quantity) } : item ) : [... userCart.items, { productid, quantity }]; 
           return { ... userCart, items: updatedItems }; }); }); };
 
   // Remove product from cart
