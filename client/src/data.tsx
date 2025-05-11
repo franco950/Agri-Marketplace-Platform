@@ -151,10 +151,8 @@ export enum DeliveryType {
   export type Order = {
     id: string;
     customertype: DeliveryType;
-    buyerId?: string;
-    supplierId?: string;
-    buyer?: Buyer;
-    supplier?: Supplier;
+    userId: string;
+    user: Buyer;
     productid: string;
     productobj: Product;
     farmerid: string;

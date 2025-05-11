@@ -1,14 +1,23 @@
-import { useParams } from "react-router-dom"
+import { useParams,useNavigate } from "react-router-dom"
 import { useCartContext } from "./cart"
 import { getCartProducts } from "./api/getproducts"
+import { postOrders } from "./api/orders"
 import { useQuery } from "@tanstack/react-query"
 import Navbar from "./Navbar"
 import './productDetail.css'
 import React from 'react';
 import { Product } from './data'; 
-import './orderPage.css'; 
+import './orderPage.css';
+export type newOrder={
+    productid:string
+    farmerid:string
+    quantity:number
+    totalcost:number
+}
 
 function OrderPage(){
+    const navigate=useNavigate()
+
     const{id}=useParams()
     const{cart,addToCart,removeFromCart}=useCartContext()
     const itemIds=cart.map(item=>item.productid)
@@ -25,7 +34,7 @@ function OrderPage(){
         <p>no items in cart</p>
         </div >)
     }
-    console.log(querykey)
+
     
     const {
         data: products,
@@ -58,10 +67,21 @@ function OrderPage(){
         const subtotal = product.priceperunit * quantity;
         return { ...product, quantity, subtotal };
     });
-    
+    const productOrder:newOrder[] = products.map(product => {
+        const item = cart.find(c => c.productid === product.id);
+        const productid=product.id
+        const farmerid=product.farmerid
+        const quantity = item?.quantity ?? 0;
+        const totalcost = product.priceperunit * quantity;
+        return {productid,farmerid, quantity,totalcost };
+    });
     const total = productsWithQuantities.reduce((acc, prod) => acc + prod.subtotal, 0);
     const handleQuantityChange = (productId: string, delta: number) => {
         addToCart(productId,delta)
+      };
+    async function handleBuy(){
+        await postOrders(productOrder)
+         navigate(`/tracking/${1}`)
       };
       
     return (
@@ -95,7 +115,7 @@ function OrderPage(){
 
         <div className="checkout-total">
             <h2>Total: Ksh {total.toLocaleString()}</h2>
-            <button className="confirm-button">Confirm Order</button>
+            <button className="confirm-button"onClick={()=>handleBuy()}>Confirm Order</button>
         </div>
         </div>
     );

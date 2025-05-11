@@ -23,6 +23,7 @@ export default function Navbar() {
         {total}
         <button className="cart-logo" onClick={()=>navigate(`/order/${all}`)}></button></div>
         <Link to="/profile">profile</Link>
+        <Link to='/tracking/1'>my Orders</Link>
         <button onClick={logout}>Logout</button></>
         
       ) : (

@@ -16,7 +16,7 @@ datasource db {
 
 // MySQL Models
 model Farmer {
-  id        String     @id @default(uuid())
+  id        String    @id @default(uuid())
   firstname String
   lastname  String
   email     String    @unique
@@ -28,25 +28,25 @@ model Farmer {
 }
 
 model Buyer {
-  id        String     @id @default(uuid())
+  id        String  @id @default(uuid())
   firstname String
   lastname  String
   email     String  @unique
   password  String
   phone     String  @db.VarChar(20)
   isactive  Boolean @default(true)
-  Order     Order[]
+
 }
 
 model Supplier {
-  id        String    @id  @default(uuid())
+  id        String  @id @default(uuid())
   firstname String
   lastname  String
   email     String  @unique
   password  String
   phone     String  @db.VarChar(20)
   isactive  Boolean @default(true)
-  Order     Order[]
+
 }
 
 enum ProductType {
@@ -80,7 +80,7 @@ enum ProductStatus {
 }
 
 model Product {
-  id        String    @id  @default(uuid())
+  id                String        @id @default(uuid())
   name              String
   type              ProductType
   unit              Unit
@@ -107,23 +107,23 @@ model Product {
 }
 
 model Order {
-  id        String    @id  @default(uuid())
-  customertype      DeliveryType
-  buyerId           String?
-  supplierId        String?
-  buyer             Buyer?       @relation(fields: [buyerId], references: [id])
-  supplier          Supplier?    @relation(fields: [supplierId], references: [id])
+  id                String       @id @default(uuid())
+  customertype      DeliveryType 
+  userId            String
+  user              User         @relation(fields: [userId], references: [id])
   productid         String
   productobj        Product      @relation(fields: [productid], references: [id])
   farmerid          String
   farmerobj         Farmer       @relation(fields: [farmerid], references: [id])
-  deliverylatitude  Float
-  deliverylongitude Float
-  deliveryoption    Delivery
+  deliverylatitude  Float?
+  deliverylongitude Float?
+  deliveryoption    Delivery     @default(FARMER)
+  quantity          Int
   totalcost         Float
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
-  tracking          Tracking @default(PACKING)
+  tracking          Tracking     @default(PACKING)
+
 }
 
 enum DeliveryType {
@@ -158,19 +158,21 @@ enum Rating {
 }
 
 model Review {
-  id        String    @id  @default(uuid())
+  id         String  @id @default(uuid())
   userId     String
   rating     Rating
   comment    String
   productobj Product @relation(fields: [productid], references: [id])
   productid  String
 }
-model User{
-  id String  @unique
+
+model User {
+  id        String  @unique
   firstname String
-  isactive Boolean @default(true)
-  email String @id 
-  usertype Role
+  isactive  Boolean @default(true)
+  email     String  @id
+  usertype  Role
+  Order     Order[]
 }
 
 enum Role {
@@ -180,16 +182,18 @@ enum Role {
   admin
   worker
 }
+
 model Admin {
-  id        String    @id  @default(uuid())
+  id        String  @id @default(uuid())
   firstname String
   lastname  String
   email     String  @unique
   password  String
   isactive  Boolean @default(true)
 }
+
 model Worker {
-  id        String    @id  @default(uuid())
+  id        String  @id @default(uuid())
   firstname String
   lastname  String
   email     String  @unique

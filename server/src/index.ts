@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import {Admin,Worker,ProductType,Delivery, Unit, ProductStatus,Farmer,farmersData,Review,reviewsData,Supplier,suppliersData,Buyer,buyersData,Product,productsData} from "./data";
-import { PrismaClient } from "../generated/prisma";
+import { PrismaClient ,DeliveryType} from "../generated/prisma";
 import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
@@ -13,7 +13,13 @@ enum normaluser {
   
 }
 type User=Buyer|Supplier|Farmer|Admin|Worker
-
+enum Role {
+  buyer,
+  supplier,
+  farmer,
+  admin,
+  worker
+}
 const app = express();
 const PORT = process.env.PORT || 5003;
 const flash=require('express-flash')
@@ -102,6 +108,11 @@ function notAuth(req:Request,res:Response,next:any){
 }
 function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+async function finduserRole(userId:string){
+  const myuser=await prisma.user.findUnique({where:{id:userId}})
+  if (myuser){return myuser.usertype}
+  
 }
 app.post("/login",notAuth, (req: Request, res: Response,next) => {
   passport.authenticate('local',(err:any, user:any) => {
@@ -337,10 +348,27 @@ app.patch('/products/farmer',checkAuth,async(req: Request, res: Response)=>{
         await prisma.$disconnect();
     }
 });
+function toDeliveryType(value: string): DeliveryType | undefined {
+  return Object.values(DeliveryType).includes(value as DeliveryType)
+    ? (value as DeliveryType)
+    : undefined;
+}
 app.post('/order',checkAuth,async(req: Request, res: Response)=>{
     try{
+        const myuser=(req.user as User)
+        let role;
+        if(myuser.id){
+           role= await finduserRole(myuser.id)
+        }
+              
         const orderdetails=req.body
-        const neworder= await prisma.order.create({ data: orderdetails});
+        if(role){
+          orderdetails.forEach((element:any) => {
+            element.customertype=toDeliveryType(role.toUpperCase())
+            element.userId=myuser.id
+          });
+        }
+        const neworder= await prisma.order.createMany({ data: orderdetails});
         res.json({neworder});
         console.log('order sent')
     }catch(error){
@@ -380,21 +408,14 @@ app.get('/order/farmer',checkAuth,async(req:Request,res:Response)=>{
         await prisma.$disconnect();
     }
 })
-app.get('/order/:client',checkAuth,async(req:Request,res:Response)=>{
+app.get('/order',checkAuth,async(req:Request,res:Response)=>{
     try{
-        const userid=(req.user as User).id
-        const client=req.params.client
-        if(client=='buyer'){
-            const myorders=await prisma.order.findMany({where:{buyerId:userid}})
-            res.json({myorders})
-            console.log('orders retrieved')
-        }
-        else if (client=='supplier'){
-            const myorders=await prisma.order.findMany({where:{supplierId:userid}})
-            res.json({myorders})
-            console.log('orders retrieved')
-        }
-        else(res.status(400).json({message:"invalid request params"}))
+        const user=(req.user as User)
+        const myorders=await prisma.order.findMany({where:{userId:user.id}, include:{farmerobj:true,user:true,productobj:true}})
+        
+        res.json(myorders)
+        
+        console.log('orders retrieved')
 
     }catch(error){
         console.error("Error in retrieving orders",error);

@@ -35,7 +35,6 @@ model Buyer {
   password  String
   phone     String  @db.VarChar(20)
   isactive  Boolean @default(true)
-  Order     Order[]
 }
 
 model Supplier {
@@ -46,7 +45,6 @@ model Supplier {
   password  String
   phone     String  @db.VarChar(20)
   isactive  Boolean @default(true)
-  Order     Order[]
 }
 
 enum ProductType {
@@ -109,17 +107,16 @@ model Product {
 model Order {
   id                String       @id @default(uuid())
   customertype      DeliveryType
-  buyerId           String?
-  supplierId        String?
-  buyer             Buyer?       @relation(fields: [buyerId], references: [id])
-  supplier          Supplier?    @relation(fields: [supplierId], references: [id])
+  userId            String
+  user              User         @relation(fields: [userId], references: [id])
   productid         String
   productobj        Product      @relation(fields: [productid], references: [id])
   farmerid          String
   farmerobj         Farmer       @relation(fields: [farmerid], references: [id])
-  deliverylatitude  Float
-  deliverylongitude Float
-  deliveryoption    Delivery
+  deliverylatitude  Float?
+  deliverylongitude Float?
+  deliveryoption    Delivery     @default(FARMER)
+  quantity          Int
   totalcost         Float
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
@@ -172,6 +169,7 @@ model User {
   isactive  Boolean @default(true)
   email     String  @id
   usertype  Role
+  Order     Order[]
 }
 
 enum Role {
