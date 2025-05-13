@@ -1,10 +1,11 @@
 import { Link, useNavigate,useSearchParams } from "react-router-dom";
 import { getProductData } from "./api/getproducts";
 import { useQuery } from '@tanstack/react-query';
-import { Product,ProductType } from "./data";
+import { Product,ProductType,Role } from "./data";
 import "./products.css"
 import Navbar from "./Navbar";
 import React from 'react';
+import { useAuth } from "./context/useauth";
 import { capitalizeFirstLetter } from "./utils/general";
   
   type Props = {
@@ -27,15 +28,21 @@ import { capitalizeFirstLetter } from "./utils/general";
   const CategoryProductList: React.FC<Props> = ({ products }) => {
     const categories = Object.values(ProductType);
     const navigate=useNavigate()
+    const{userRole}=useAuth()
+    const isfarmer=userRole===Role.farmer
     function handleSearch(id:string){
       const params={id:id}
       const queryString = new URLSearchParams(params as Record<string, string>).toString();
-      navigate(`/productdetails?${queryString}`);}
+      if (isfarmer){navigate(`/productdetails/farmer?${queryString}`)}else{
+      navigate(`/productdetails?${queryString}`)}}
   
     return (
       <div className="app">
-        <h1>Products</h1>
-        <Link to="/product" className="browse-link">Browse All</Link>
+        {(isfarmer)?(<h1> My Products</h1>):(<h1>Products</h1>)}
+        {(isfarmer)?(
+          <Link to="/product/farmer" className="browse-link">Browse All</Link>):(
+          <Link to="/product" className="browse-link">Browse All</Link>)}
+
   
         {categories.map((category) => {
           const filtered = products.filter((p) => p.type === category);

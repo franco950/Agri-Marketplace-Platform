@@ -10,6 +10,7 @@ import TrackingPage from './trackingpage';
 import ProfilePage from './profilepage';
 import ProductDetail from './productdetails';
 import { CartProvider } from './cart'
+import FarmerDetailPage from './farmerproduct';
 
 function App(){
   return(<>
@@ -21,7 +22,9 @@ function App(){
         <Route path="/register" element={<RegistrationPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/product" element={<ProtectedRoute><ProductPage /></ProtectedRoute>} />
+         <Route path="/product/farmer" element={<ProtectedRoute><ProductPage /></ProtectedRoute>} />
         <Route path="/productdetails" element={<ProtectedRoute><ProductDetail /></ProtectedRoute>} />
+        <Route path="/productdetails/farmer" element={<ProtectedRoute><FarmerDetailPage /></ProtectedRoute>} />
         <Route path="/order/:id" element={<ProtectedRoute><OrderPage /></ProtectedRoute>} />
         <Route path="/tracking/:id" element={<ProtectedRoute><TrackingPage /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />

@@ -10,7 +10,7 @@ export type Product = {
     location: string;
     status: ProductStatus;
     description: string;
-    images: any; // Consider using a more specific type if the structure of `images` is known
+    images: any; 
     locationlatitude: number;
     locationlongitude: number;
     createdAt: Date;
@@ -57,6 +57,7 @@ export enum DeliveryType {
   }
   
   export enum Role {
+    guest='guest',
     buyer = 'buyer',
     supplier = 'supplier',
     farmer = 'farmer',

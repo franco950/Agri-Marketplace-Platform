@@ -1,6 +1,8 @@
 import { useState,useEffect } from 'react';
 import Navbar from './Navbar';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from './context/useauth';
+import { Role } from './data';
 
 async function getHomeData(setMessage: React.Dispatch<React.SetStateAction<string>>,
   setProducts: React.Dispatch<React.SetStateAction<any>>){
@@ -31,6 +33,8 @@ export type searchParams={
   type?:string;
 }
 function Homepage(){
+  const {userRole}=useAuth()
+  const isfarmer=userRole===Role.farmer
   const navigate=useNavigate()
   const [products, setProducts] = useState<any>(null);
   const [message,setMessage]=useState('')
@@ -88,7 +92,8 @@ function Homepage(){
     
     else if (searchParams.location || searchParams.name ||searchParams.type){ 
       const queryString = new URLSearchParams(filteredParams as Record<string, string>).toString();
-      navigate(`/product?${queryString}`);}
+      {isfarmer?(navigate(`/product/farmer?${queryString}`)):(navigate(`/product?${queryString}`))}
+      }
   }
     return (<>
     <div className='hero'>
@@ -100,7 +105,11 @@ function Homepage(){
           Source fresh produce and grains directly from local farms.<br />
           Connecting buyers and farmers for fair, transparent trade.
         </p>
-        <Link to={'/product'} className="explore-btn">Explore Marketplace</Link>
+        {isfarmer?(
+          <Link to={'/product/farmer'} className="explore-btn">View My products</Link>
+        ):(
+          <Link to={'/product'} className="explore-btn">Explore Marketplace</Link>)}
+        
       </div>
       <p className='message'>{message}</p>
       <div className="search-box">

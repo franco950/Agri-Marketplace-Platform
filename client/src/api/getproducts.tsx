@@ -98,3 +98,31 @@ export async function getProductData(params:searchParams):Promise<Product[]>{
         console.error("Error retrieving products:", error);
         throw new Error(error)} 
   }
+
+    export async function patchProduct(values:any,id:string):Promise<Product>{
+    try{
+        
+    const query=`http://localhost:5000/product/farmer`
+
+    
+    const response=await fetch(query,{
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json", 
+        },
+        credentials: "include",
+        body: JSON.stringify({values,id})
+    
+    
+    })
+    const myproduct = await response.json(); 
+    if (!response.ok) { 
+        const error = await response.json();
+        throw new Error(error.message || "Request failed")};
+   
+    return myproduct}
+
+    catch(error:any) {
+        console.error("Error updating product:", error);
+        throw new Error(error)} 
+  }

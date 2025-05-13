@@ -1,7 +1,8 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import {Admin,Worker,ProductType,Delivery, Unit, ProductStatus,Farmer,farmersData,Review,reviewsData,Supplier,suppliersData,Buyer,buyersData,Product,productsData} from "./data";
+import {Admin,Worker,ProductType,Delivery, Unit, ProductStatus,Farmer,farmersData,Review,
+  reviewsData,Supplier,suppliersData,Buyer,buyersData,Product,productsData,User,Role,Order} from "./data";
 import { PrismaClient ,DeliveryType} from "../generated/prisma";
 import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
@@ -11,14 +12,6 @@ enum normaluser {
   supplier='supplier',
   farmer='farmer'
   
-}
-type User=Buyer|Supplier|Farmer|Admin|Worker
-enum Role {
-  buyer,
-  supplier,
-  farmer,
-  admin,
-  worker
 }
 const app = express();
 const PORT = process.env.PORT || 5003;
@@ -34,7 +27,7 @@ app.use(
   cors({ 
     origin: "http://localhost:5173", 
     credentials: true, 
-    methods: ["GET", "POST", "PUT", "DELETE"], 
+    methods: ["GET", "POST", "PUT","PATCH", "DELETE"], 
     allowedHeaders: ["Content-Type", "Authorization"], 
   })
 );
@@ -62,10 +55,7 @@ async function findUserByEmail(email:string){
     
 async function findById(id:string){
     const myuser= await prisma.user.findUnique({where:{id:id} })
-    if(myuser){
-      const usertype=myuser.usertype
-      const userdata=await (prisma as any)[usertype].findUnique({where:{id:id} })
-      return userdata}
+    if(myuser){return myuser}
   }
 
 function initialize(passport:any){
@@ -94,7 +84,19 @@ function initialize(passport:any){
     } catch (err) {
       done(err, null);
     }})}
-    
+  import multer from 'multer';
+import path from 'path';
+
+const storage = multer.diskStorage({
+  destination: 'public/images',
+  filename: (req, file, cb) => {
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName);
+  },
+});
+
+const upload = multer({ storage });
+
 function checkAuth(req:Request,res:Response,next:any){
   if (req.isAuthenticated()){return next()}
   
@@ -183,9 +185,11 @@ app.delete("/logout", (req: Request, res: Response, next) => {
   });
 
 app.get("/auth-status", (req, res) => {
+
   res.json({
     isLoggedin: req.isAuthenticated(),
     id: req.isAuthenticated() ? (req.user as User).id : null,
+    role: req.isAuthenticated() ? (req.user as User).usertype : Role.guest,
     username: req.isAuthenticated() ? (req.user as User).firstname : null
   });
 });
@@ -247,13 +251,18 @@ app.get('/home',async(req: Request, res: Response)=>{
   });
 app.get('/product',async(req: Request, res: Response)=>{
   try{
+    const isfarmer=(req.user as User).usertype===Role.farmer
+    console.log(isfarmer)
+    const userid=(req.user as User).id
     let myproducts=[]
     let result;
     if (req.query){
     const filters = buildProductFilter(req.query);
 
     myproducts = await prisma.product.findMany({
+      
       where: {
+        ...(isfarmer && { farmerid: userid}),
         ...(filters.id && { id: filters.id}),
         ...(filters.name && { name: filters.name}),
         ...(filters.type && {type: filters.type }),
@@ -266,10 +275,12 @@ app.get('/product',async(req: Request, res: Response)=>{
 
       if (!req.query || myproducts.length==0) {
      
-        const myproducts=await prisma.product.findMany()
+        const myproducts=await prisma.product.findMany({where:{...(isfarmer &&{farmerid:userid})}})
         result='all'
         res.json({myproducts,result})
+        
       }
+      console.log(result)
     ;
     console.log('product types sent')
   }catch(error){
@@ -306,7 +317,7 @@ app.post('/product/checkout',checkAuth,async(req: Request, res: Response)=>{
   }
 });
 
-app.get('/products/farmer',checkAuth,async(req: Request, res: Response)=>{
+app.get('/product/farmer',checkAuth,async(req: Request, res: Response)=>{
     try{
         const value=(req.user as User).id
         const myproducts = await prisma.product.
@@ -321,7 +332,7 @@ app.get('/products/farmer',checkAuth,async(req: Request, res: Response)=>{
     }
 });
 
-app.post('/products/farmer',checkAuth,async(req: Request, res: Response)=>{
+app.post('/product/farmer',checkAuth,async(req: Request, res: Response)=>{
     try{
         const values = req.body
         const myproducts = await prisma.product.create({ data: values });
@@ -334,12 +345,31 @@ app.post('/products/farmer',checkAuth,async(req: Request, res: Response)=>{
         await prisma.$disconnect();
     }
 });
-app.patch('/products/farmer',checkAuth,async(req: Request, res: Response)=>{
+app.patch('/product/farmer',checkAuth, upload.array('images'),async(req: Request, res: Response)=>{
     try{
-        const values = req.body
-        const productid=values.productid
-        const myproducts = await prisma.product.update({ where:{id:productid},data: values });
-        res.json({myproducts});
+     
+      if (!req.body.values){console.error('no changes found');throw new Error}
+      const productId=req.body.id
+      const values=req.body.values
+    //const { productId, files, ...rest } = req.body;
+   // const uploadedFiles = req.files as Express.Multer.File[];
+
+  //   const existingImages = Array.isArray(req.body.existingImages)
+  //     ? req.body.existingImages
+  //     : [req.body.existingImages];
+
+  //   const newImageUrls = uploadedFiles.map(
+  //     (file) => `/images/${file.filename}`
+  //   );
+
+  //   const allImages = [...existingImages, ...newImageUrls];
+  //   const values = {
+  //   ...rest,
+  //   images: allImages,
+  // };
+
+        const myproduct= await prisma.product.update({ where:{id:productId},data: values });
+        res.json(myproduct);
         console.log('product modified succesfully')
     }catch(error){
         console.error("Error in /products modification",error);
@@ -354,6 +384,7 @@ function toDeliveryType(value: string): DeliveryType | undefined {
     : undefined;
 }
 app.post('/order',checkAuth,async(req: Request, res: Response)=>{
+
     try{
         const myuser=(req.user as User)
         let role;
@@ -409,6 +440,7 @@ app.get('/order/farmer',checkAuth,async(req:Request,res:Response)=>{
     }
 })
 app.get('/order',checkAuth,async(req:Request,res:Response)=>{
+  console.log(req.user)
     try{
         const user=(req.user as User)
         const myorders=await prisma.order.findMany({where:{userId:user.id}, include:{farmerobj:true,user:true,productobj:true}})

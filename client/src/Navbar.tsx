@@ -4,10 +4,11 @@ import { useCartContext } from "./cart";
 import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
-  let { isLoggedin, logout } = useAuth();
+  let { isLoggedin, logout ,userRole} = useAuth();
   const { total } = useCartContext();
   const navigate=useNavigate()
-  const all=1
+  console.log(userRole)
+
 
   return (
     <nav className="navbar">
@@ -16,15 +17,16 @@ export default function Navbar() {
         <li><Link to="/">Home</Link></li>
         <li><a href="/about">About</a></li>
         <li><a href="/contact">Contact</a></li>
-      
+      {(userRole=='farmer')?(
+        <li><Link to="/product/farmer">my products</Link></li>
+        
+      ):('')}
       {isLoggedin ? (
         <>
-        <div>
-        {total}
-        <button className="cart-logo" onClick={()=>navigate(`/order/${all}`)}></button></div>
-        <Link to="/profile">profile</Link>
+        <li><button className="cart-logo" onClick={()=>navigate(`/order/1`)}>{total}</button></li>
+        <li><Link to="/profile">profile</Link></li>
         <Link to='/tracking/1'>my Orders</Link>
-        <button onClick={logout}>Logout</button></>
+        <li><button onClick={logout}>Logout</button></li></>
         
       ) : (
         <li className="sign-in"><Link to="/login">Sign in</Link></li>

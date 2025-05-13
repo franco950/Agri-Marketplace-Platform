@@ -42,7 +42,53 @@ export enum ProductType {
     NINE = "NINE",
     TEN = "TEN"
   }
+  export type User ={
+  id: string  
+  firstname:string
+  isactive:boolean 
+  email:string
+  usertype:Role
+  Order: Order[]
+}
+export enum DeliveryType {
+  BUYER='BUYER',
+  SUPPLIER='SUPPLIER'
+}
+
+export type Order= {
+  id:string
+  customertype:DeliveryType 
+  userId           : string
+  user              :User        
+  productid         :string
+  productobj?        :Product
+  farmerid          :string
+  farmerobj         :Farmer       
+  deliverylatitude?  :number
+  deliverylongitude? :number
+  deliveryoption    :Delivery  
+  quantity          :number
+  totalcost         :number
+  createdAt         :Date
+  updatedAt         :Date 
+  tracking          :Tracking     
+
+}
+enum Tracking {
+  DELIVERED='DELIVERED',
+  ENROUTE='ENROUTE',
+  PACKING='PACKING',
+  PACKED='PACKED'
+}
+export enum Role {
+  guest='guest',
+  buyer='buyer',
+  supplier='supplier',
+  farmer='farmer',
+  admin='admin',
+  worker='worker',
   
+}
   export type Admin ={
     id?: string;
     firstname: string;
