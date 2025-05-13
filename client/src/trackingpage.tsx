@@ -19,11 +19,9 @@ function TrackingPage(){
 
     
   
-const statuses = ['Preparing', 'Shipped', 'Delivered'];
+const statuses = ['PACKING', 'PACKED','ENROUTE','DELIVERED']
 
 const getStatusIndex = (status: string) => statuses.indexOf(status);
-
-
 
   return (
     <><Navbar/>
@@ -57,6 +55,7 @@ const getStatusIndex = (status: string) => statuses.indexOf(status);
                 className="progress-bar"
                 style={{ width: `${((currentStep + 1) / statuses.length) * 100}%` }}
               ></div>
+             
             </div>
           </div>
         );

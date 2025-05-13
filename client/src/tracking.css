@@ -1,7 +1,7 @@
 .tracking-page {
   padding: 2rem;
   font-family: Arial, sans-serif;
-  width:100%;
+  width:100vw;
   
   margin-top: 90px;
   margin-bottom: 100px;
@@ -19,12 +19,6 @@
   padding: 1rem;
   border-radius: 8px;
 }
-
-.current-status {
-  color: rgb(6, 125, 98);
-}
-
-
 .progress-step {
   flex: 1;
   text-align: center;
@@ -41,35 +35,39 @@
   background-color: #4caf50;
   color: white;
 }
-@media (max-width: 575px) {
-  .progress-labels-container {
-    font-size: 16px;
-  }
-}
 
-@media (max-width: 450px) {
-  .progress-labels-container {
-    flex-direction: column;
-    margin-bottom: 5px;
-  }
 
-  .progress-label {
-    margin-bottom: 3px;
+
+.progress-labels-container {
+  flex-direction: column;
+  margin-bottom: 5px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  text-align: center;
+  margin-top: 8px;
   }
-}
 
 .progress-bar-container {
   height: 25px;
   width: 100%;
-
   border: 1px solid rgb(200, 200, 200);
   border-radius: 50px;
+  position: relative;
   overflow: hidden;
+  background-color: #e0e0e0;
+  margin-top: 16px;
 }
-
 .progress-bar {
   height: 100%;
   background-color: green;
   border-radius: 50px;
-  width: 50%;
+  transition: width 0.3s ease;
 }
+.progress-label {
+  font-size: 14px;
+  color: #555;
+  position: relative;
+  margin-bottom: 3px;
+}
+
+
