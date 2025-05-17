@@ -79,7 +79,7 @@ function Homepage(){
   };
   function handleSearch(searchParams:searchParams,setMessage:React.Dispatch<React.SetStateAction<string>>){
     const filteredParams = Object.fromEntries(
-      Object.entries(searchParams).filter(([key, value]) => value !== '')
+      Object.entries(searchParams).filter(([_, value]) => value !== '')
     );
     if (!searchParams.location && !searchParams.name && !searchParams.type){
       setMessage('please enter at least one parameter')
