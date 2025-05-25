@@ -174,7 +174,7 @@ exports.Prisma.ProductScalarFieldEnum = {
   farmerid: 'farmerid'
 };
 
-exports.Prisma.OrderScalarFieldEnum = {
+exports.Prisma.MyorderScalarFieldEnum = {
   id: 'id',
   customertype: 'customertype',
   userId: 'userId',
@@ -285,7 +285,7 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
-exports.Prisma.OrderOrderByRelevanceFieldEnum = {
+exports.Prisma.myorderOrderByRelevanceFieldEnum = {
   id: 'id',
   userId: 'userId',
   productid: 'productid',
@@ -394,7 +394,7 @@ exports.Prisma.ModelName = {
   Buyer: 'Buyer',
   Supplier: 'Supplier',
   Product: 'Product',
-  Order: 'Order',
+  myorder: 'myorder',
   Review: 'Review',
   User: 'User',
   Admin: 'Admin',

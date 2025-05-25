@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -24,7 +18,7 @@ model Farmer {
   phone     String    @db.VarChar(20)
   isactive  Boolean   @default(true)
   products  Product[]
-  Order     Order[]
+  Order     myorder[]
 }
 
 model Buyer {
@@ -101,10 +95,10 @@ model Product {
   farmerid          String
   farmerobj         Farmer        @relation(fields: [farmerid], references: [id])
   reviews           Review[]
-  orders            Order[]
+  orders            myorder[]
 }
 
-model Order {
+model myorder {
   id                String       @id @default(uuid())
   customertype      DeliveryType
   userId            String
@@ -164,12 +158,12 @@ model Review {
 }
 
 model User {
-  id        String  @unique
+  id        String    @unique
   firstname String
-  isactive  Boolean @default(true)
-  email     String  @id
+  isactive  Boolean   @default(true)
+  email     String    @id
   usertype  Role
-  Order     Order[]
+  Order     myorder[]
 }
 
 enum Role {
