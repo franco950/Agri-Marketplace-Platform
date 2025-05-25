@@ -25,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         credentials: "include",
       });
       const data = await response.json();
+      console.log(data)
       if (response.ok) {
         setIsLoggedin(data.isLoggedin);
         setUsername(data.username);
@@ -43,9 +44,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  useEffect(() => {
-    checkAuth(); // Call on mount
-  }, []);
+
+    useEffect(() => {
+    checkAuth(); 
+  }, [isLoggedin]);
 
   // Logout function (updates global state)
   const logout = async () => {
