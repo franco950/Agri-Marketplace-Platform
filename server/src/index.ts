@@ -399,7 +399,7 @@ app.post('/order',checkAuth,async(req: Request, res: Response)=>{
             element.userId=myuser.id
           });
         }
-        const neworder= await prisma.order.createMany({ data: orderdetails});
+        const neworder= await prisma.myorder.createMany({ data: orderdetails});
         res.json({neworder});
         console.log('order sent')
     }catch(error){
@@ -414,7 +414,7 @@ app.patch('/order/farmer',checkAuth,async(req: Request, res: Response)=>{
       const orderdetails=req.body
       const farmerid=(req.user as User).id
       const orderid=orderdetails.id
-      const updatedorder= await prisma.order.update({ where:{id:orderid,farmerid:farmerid}, data: orderdetails});
+      const updatedorder= await prisma.myorder.update({ where:{id:orderid,farmerid:farmerid}, data: orderdetails});
       res.json({updatedorder});
       console.log('order sent')
   }catch(error){
@@ -427,7 +427,7 @@ app.patch('/order/farmer',checkAuth,async(req: Request, res: Response)=>{
 app.get('/order/farmer',checkAuth,async(req:Request,res:Response)=>{
     try{
         const userid=(req.user as User).id
-        const myorders=await prisma.order.findMany({where:{farmerid:userid}})
+        const myorders=await prisma.myorder.findMany({where:{farmerid:userid}})
         res.json({myorders})
         console.log('orders retrieved')
 
@@ -443,7 +443,7 @@ app.get('/order',checkAuth,async(req:Request,res:Response)=>{
   console.log(req.user)
     try{
         const user=(req.user as User)
-        const myorders=await prisma.order.findMany({where:{userId:user.id}, include:{farmerobj:true,user:true,productobj:true}})
+        const myorders=await prisma.myorder.findMany({where:{userId:user.id}, include:{farmerobj:true,user:true,productobj:true}})
         
         res.json(myorders)
         

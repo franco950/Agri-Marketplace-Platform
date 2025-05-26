@@ -1,7 +1,6 @@
 import { createContext,useContext,useEffect, useState } from 'react';
 import { useAuth } from './context/useauth';
 
-
 type CartProduct = {
   productid: string;
   quantity: number;
@@ -98,41 +97,3 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 export const useCartContext = () => { const context = useContext(CartContext); 
   if (!context) throw new Error('useCartContext must be used within a CartProvider'); 
   return context; };
-
-  // const addToCart0 = (productid: string, quantity: number) => {
-  //   console.log("aadded");
-  //   setCart((prevCart) => {
-  //     return prevCart.map((userCart) =>
-  //       userCart.userid === userId
-  //         ? {
-  //             ...userCart,
-  //             items: userCart.items.map((item) =>
-  //               item.productid === productid
-  //                 ? { ...item, quantity: item.quantity + quantity }
-  //                 : item
-  //             ),
-  //           }
-  //         : userCart
-  //     );
-  //   });
-  // };
-  // const addToCart1 = (productid: string, quantity: number) => {
-  //   console.log('aadded')
-  //   setCart((prevCart) => {
-  //     const newCart = [...prevCart];
-  //     let userCart = newCart.find((c) => c.userid === userId);
-
-  //     if (!userCart) {
-  //       userCart = { userid: userId, items: [] };
-  //       newCart.push(userCart);
-  //     }
-  //     const product = userCart.items.find((item) => item.productid === productid);
-  //     if (product) {
-  //       product.quantity += quantity;
-  //     } else {
-  //       userCart.items.push({ productid, quantity });
-  //     }
-
-  //     return newCart;
-  //   });
-  // };

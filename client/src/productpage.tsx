@@ -90,9 +90,6 @@ import { capitalizeFirstLetter } from "./utils/general";
     const location = searchParams.get('location') || '';
     const id = searchParams.get('id') || '';
     const queryParams = { name, type, location,id };
-    
-   
-  
     const {
       data: products,
       isLoading,

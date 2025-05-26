@@ -16,9 +16,7 @@ function TrackingPage(){
     if (isLoading) return <p>Loading...</p>;
     if (error instanceof Error) return <p>{error.message}</p>;
     if (!orders||orders.length===0) return <p>No orders to display</p>;
-
     
-  
 const statuses = ['PACKING', 'PACKED','ENROUTE','DELIVERED']
 
 const getStatusIndex = (status: string) => statuses.indexOf(status);
