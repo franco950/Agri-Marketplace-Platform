@@ -3,7 +3,33 @@ import Navbar from './Navbar';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './context/useauth';
 import { Role } from './data';
-import { getHomeData } from './api/homepage';
+
+const url=import.meta.env.VITE_SERVER_URL
+
+async function getHomeData(setMessage: React.Dispatch<React.SetStateAction<string>>,
+  setProducts: React.Dispatch<React.SetStateAction<any>>){
+   
+  try{
+   
+  const response=await fetch(`${url}/home`,{
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json", 
+      },
+      credentials: "include",
+  
+  })
+  const data = await response.json();
+ 
+  if (!response.ok) { 
+      throw new Error(data.message || "Request failed")};
+  
+  setProducts(data)
+      }
+  catch(error:any) {
+      console.error("Error retrieving products:", error);
+      setMessage(error.message || "Error  retrieving products");} 
+}
 
 export type searchParams={
   name?:string;
@@ -24,6 +50,9 @@ function Homepage(){
   const locations = products?.locations || [];
   const uppernames=products?.names || [];
   const names:string[]=uppernames.map((name: string) => name.toLowerCase());
+
+  
+
 
   function mapstuff(stuff:any[]){
     if (!stuff || stuff.length === 0) return null;

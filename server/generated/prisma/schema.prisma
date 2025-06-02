@@ -8,134 +8,134 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// MySQL Models
-model Farmer {
-  id        String    @id @default(uuid())
+model admin {
+  id        String  @id @default(uuid())
   firstname String
   lastname  String
-  email     String    @unique
+  email     String  @unique(map: "Admin_email_key")
+  password  String
+  isactive  Boolean @default(true)
+}
+
+model buyer {
+  firstname String
+  lastname  String
+  email     String  @unique(map: "Buyer_email_key")
+  password  String
+  phone     String  @db.VarChar(20)
+  isactive  Boolean @default(true)
+  id        String  @id @default(uuid())
+}
+
+model farmer {
+  firstname String
+  lastname  String
+  email     String    @unique(map: "Farmer_email_key")
   password  String
   phone     String    @db.VarChar(20)
   isactive  Boolean   @default(true)
-  products  Product[]
-  Order     myorder[]
+  id        String    @id @default(uuid())
+  order     myorder[]
+  product   product[]
 }
 
-model Buyer {
-  id        String  @id @default(uuid())
-  firstname String
-  lastname  String
-  email     String  @unique
-  password  String
-  phone     String  @db.VarChar(20)
-  isactive  Boolean @default(true)
+model myorder {
+  id                String               @id @default(uuid())
+  customertype      order_customertype
+  productid         String
+  deliverylatitude  Float?
+  deliverylongitude Float?
+  deliveryoption    order_deliveryoption @default(FARMER)
+  totalcost         Float
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  tracking          order_tracking       @default(PACKING)
+  farmerid          String
+  userId            String
+  quantity          Int
+  farmer            farmer               @relation(fields: [farmerid], references: [id], map: "Order_farmerid_fkey")
+  product           product              @relation(fields: [productid], references: [id], map: "Order_productid_fkey")
+  user              user                 @relation(fields: [userId], references: [id], map: "Order_userId_fkey")
+
+  @@index([farmerid], map: "Order_farmerid_fkey")
+  @@index([productid], map: "Order_productid_fkey")
+  @@index([userId], map: "Order_userId_fkey")
 }
 
-model Supplier {
-  id        String  @id @default(uuid())
-  firstname String
-  lastname  String
-  email     String  @unique
-  password  String
-  phone     String  @db.VarChar(20)
-  isactive  Boolean @default(true)
-}
-
-enum ProductType {
-  FRUIT
-  VEGETABLE
-  GRAIN
-  LEGUME
-  TUBER
-  DAIRY
-  MEAT
-  POULTRY
-  OTHER
-}
-
-enum Unit {
-  KG
-  LITERS
-  BAGS
-  CRATES
-  BUNCHES
-  PIECES
-  OTHER
-}
-
-enum ProductStatus {
-  AVAILABLE
-  SOLD
-  PENDING
-  EXPIRED
-  RESERVED
-}
-
-model Product {
-  id                String        @id @default(uuid())
+model product {
+  id                String         @id @default(uuid())
   name              String
-  type              ProductType
-  unit              Unit
+  type              product_type
+  unit              product_unit
   priceperunit      Int
   quantity          Int
   variety           String
   perishdate        DateTime
   location          String
-  status            ProductStatus
+  status            product_status
   description       String
   images            Json
-  locationlatitude  Float         @default(0)
-  locationlongitude Float         @default(0)
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  discount          Int           @default(0)
-  supplierthreshold Int           @default(0)
-  farmerdelivery    Boolean       @default(false)
-  servicedelivery   Boolean       @default(false)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
   farmerid          String
-  farmerobj         Farmer        @relation(fields: [farmerid], references: [id])
-  reviews           Review[]
-  orders            myorder[]
+  discount          Int            @default(0)
+  locationlatitude  Float          @default(0)
+  locationlongitude Float          @default(0)
+  supplierthreshold Int            @default(0)
+  farmerdelivery    Boolean        @default(false)
+  servicedelivery   Boolean        @default(false)
+  order             myorder[]
+  farmer            farmer         @relation(fields: [farmerid], references: [id], map: "Product_farmerid_fkey")
+  review            review[]
+
+  @@index([farmerid], map: "Product_farmerid_fkey")
 }
 
-model myorder {
-  id                String       @id @default(uuid())
-  customertype      DeliveryType
-  userId            String
-  user              User         @relation(fields: [userId], references: [id])
-  productid         String
-  productobj        Product      @relation(fields: [productid], references: [id])
-  farmerid          String
-  farmerobj         Farmer       @relation(fields: [farmerid], references: [id])
-  deliverylatitude  Float?
-  deliverylongitude Float?
-  deliveryoption    Delivery     @default(FARMER)
-  quantity          Int
-  totalcost         Float
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
-  tracking          Tracking     @default(PACKING)
+model review {
+  id        String        @id @default(uuid())
+  userId    String
+  rating    review_rating
+  comment   String
+  productid String
+  product   product       @relation(fields: [productid], references: [id], map: "Review_productid_fkey")
+
+  @@index([productid], map: "Review_productid_fkey")
 }
 
-enum DeliveryType {
+model supplier {
+  firstname String
+  lastname  String
+  email     String  @unique(map: "Supplier_email_key")
+  password  String
+  phone     String  @db.VarChar(20)
+  isactive  Boolean @default(true)
+  id        String  @id @default(uuid())
+}
+
+model user {
+  firstname String
+  isactive  Boolean       @default(true)
+  email     String        @id
+  usertype  user_usertype
+  id        String        @unique(map: "User_id_key")
+  order     myorder[]
+}
+
+model worker {
+  id        String  @id @default(uuid())
+  firstname String
+  lastname  String
+  email     String  @unique(map: "Worker_email_key")
+  password  String
+  isactive  Boolean @default(true)
+}
+
+enum order_customertype {
   BUYER
   SUPPLIER
 }
 
-enum Tracking {
-  DELIVERED
-  ENROUTE
-  PACKING
-  PACKED
-}
-
-enum Delivery {
-  FARMER
-  SELF
-  SERVICE
-}
-
-enum Rating {
+enum review_rating {
   ONE
   TWO
   THREE
@@ -148,25 +148,19 @@ enum Rating {
   TEN
 }
 
-model Review {
-  id         String  @id @default(uuid())
-  userId     String
-  rating     Rating
-  comment    String
-  productobj Product @relation(fields: [productid], references: [id])
-  productid  String
+enum product_type {
+  FRUIT
+  VEGETABLE
+  GRAIN
+  LEGUME
+  TUBER
+  DAIRY
+  MEAT
+  POULTRY
+  OTHER
 }
 
-model User {
-  id        String    @unique
-  firstname String
-  isactive  Boolean   @default(true)
-  email     String    @id
-  usertype  Role
-  Order     myorder[]
-}
-
-enum Role {
+enum user_usertype {
   buyer
   supplier
   farmer
@@ -174,20 +168,33 @@ enum Role {
   worker
 }
 
-model Admin {
-  id        String  @id @default(uuid())
-  firstname String
-  lastname  String
-  email     String  @unique
-  password  String
-  isactive  Boolean @default(true)
+enum product_unit {
+  KG
+  LITERS
+  BAGS
+  CRATES
+  BUNCHES
+  PIECES
+  OTHER
 }
 
-model Worker {
-  id        String  @id @default(uuid())
-  firstname String
-  lastname  String
-  email     String  @unique
-  password  String
-  isactive  Boolean @default(true)
+enum order_deliveryoption {
+  FARMER
+  SELF
+  SERVICE
+}
+
+enum product_status {
+  AVAILABLE
+  SOLD
+  PENDING
+  EXPIRED
+  RESERVED
+}
+
+enum order_tracking {
+  DELIVERED
+  ENROUTE
+  PACKING
+  PACKED
 }

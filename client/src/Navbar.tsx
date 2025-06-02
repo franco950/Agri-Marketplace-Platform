@@ -1,18 +1,17 @@
-import { Link } from "react-router-dom";
 import { useAuth } from "./context/useauth";
 import { useCartContext } from "./cart";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link} from "react-router-dom";
 
 export default function Navbar() {
   let { isLoggedin, logout ,userRole} = useAuth();
   const { total } = useCartContext();
   const navigate=useNavigate()
-  console.log(userRole)
+  console.log('usertype:',userRole)
 
 
   return (
     <nav className="navbar">
-      <div className="logo">AgriGo</div>
+      <li className="logo">AgriGo</li>
       <ul className="nav-links">
         <li><Link to="/">Home</Link></li>
         <li><a href="/about">About</a></li>
@@ -29,7 +28,7 @@ export default function Navbar() {
         <li><button onClick={logout}>Logout</button></li></>
         
       ) : (
-        <li className="sign-in"><Link to="/login">Sign in</Link></li>
+        <li className="sign-in"><Link to="/login">Login</Link></li>
         
       )}</ul>
     </nav>

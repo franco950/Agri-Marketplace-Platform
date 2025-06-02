@@ -1,48 +1,78 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+dotenv.config();
 import {Admin,Worker,ProductType,Delivery, Unit, ProductStatus,Farmer,farmersData,Review,
   reviewsData,Supplier,suppliersData,Buyer,buyersData,Product,productsData,User,Role,Order} from "./data";
-import { PrismaClient ,DeliveryType} from "../generated/prisma";
+import { PrismaClient ,order_customertype as DeliveryType} from "../generated/prisma";
 import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-
+import MySQLStoreFactory from 'express-mysql-session';
+  import multer from 'multer';
 enum normaluser {
   buyer='buyer',
   supplier='supplier',
   farmer='farmer'
   
 }
+
 const app = express();
-const PORT = process.env.PORT || 5003;
+const PORT = process.env.PORT || 5000;
 const flash=require('express-flash')
-const session=require('express-session')
+
 const passport=require('passport')
 const LocalStrategy=require('passport-local').Strategy
 const bcrypt=require('bcrypt')
 const prisma = new PrismaClient()
-dotenv.config();
+const session=require('express-session')
+const MySQLStore = MySQLStoreFactory(session);
+app.set('trust proxy', 1);
 
-app.use(
-  cors({ 
-    origin: "http://localhost:5173", 
-    credentials: true, 
-    methods: ["GET", "POST", "PUT","PATCH", "DELETE"], 
-    allowedHeaders: ["Content-Type", "Authorization"], 
-  })
+  const corsOptions = {
+  origin: process.env.ORIGIN,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+  const sessionStore= new MySQLStore({
+  host: process.env.DATABASE_HOST,
+  port: 3306,
+  user: 'root',
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME
+ 
+});
+let samesite;
+let secure;
+
+if (process.env.ENV=='dev'){
+  samesite='Strict'
+  secure=false
+}else{
+  samesite='None'
+  secure=true
+}
+app.use(session({
+  name: 'connect.sid',
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  store: sessionStore,
+  cookie: { 
+  secure: secure,
+  httpOnly: true,
+  sameSite: samesite,
+  maxAge: 1000 * 60 * 60 * 24,} })
 );
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); 
 app.use(express.json());
 app.use(flash())
-app.use(session({
-  secret:process.env.SESSION_SECRET,
-  resave:false,
-  saveUninitialized:false
-}))
 
 initialize(passport)
 app.use(passport.initialize())
 app.use(passport.session())
-
 
 async function findUserByEmail(email:string){
   const myuser=await prisma.user.findUnique({where:{email:email} })
@@ -50,7 +80,6 @@ async function findUserByEmail(email:string){
     const usertype=myuser.usertype
     const userdata=await (prisma as any)[usertype].findUnique({where:{email:email} })
     return userdata}
-
 }
     
 async function findById(id:string){
@@ -77,15 +106,22 @@ function initialize(passport:any){
     
   passport.use(new LocalStrategy({usernameField:'email'},authenticate))
   passport.serializeUser((user:any,done:any)=>{done(null,user.id)})
-  passport.deserializeUser(async(id:string,done:any)=>{
-    try {
-      const user = await findById(id);
-      done(null, user);
-    } catch (err) {
-      done(err, null);
-    }})}
-  import multer from 'multer';
-import path from 'path';
+  passport.deserializeUser(async (id: string, done:any) => {
+  try {
+
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      console.warn("User not found during deserialization");
+      return done(null, false);
+    }
+  
+    done(null, user);
+  } catch (err) {
+    console.error("Error in deserializeUser:", err);
+    done(err, null);
+  }
+});
+}
 
 const storage = multer.diskStorage({
   destination: 'public/images',
@@ -94,10 +130,9 @@ const storage = multer.diskStorage({
     cb(null, uniqueName);
   },
 });
-
 const upload = multer({ storage });
 
-function checkAuth(req:Request,res:Response,next:any){
+function checkAuth(req:Request,res:Response,next:any){res.set("Cache-Control", "no-store");
   if (req.isAuthenticated()){return next()}
   
   return res.status(401).json({ message: "Unauthorized. Please log in." }); 
@@ -116,18 +151,39 @@ async function finduserRole(userId:string){
   if (myuser){return myuser.usertype}
   
 }
+//for debugging
+// console.log('cors')
+// app.get("/cors-test", (req, res) => {
+
+//   res.json({ message: "CORS works!" });
+// });
+// app.get("/session-debug", (req, res) => {
+  
+//     console.log(' session-debug')
+//     console.log(res)
+//   res.json({
+//     session: req.session,
+//     user: req.user
+//   });
+// });
+console.log('login')
 app.post("/login",notAuth, (req: Request, res: Response,next) => {
   passport.authenticate('local',(err:any, user:any) => {
     if (err) return next(err);
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
     req.logIn(user, (err:any) => {
-      if (err) return next(err);
+      if (err) {
+        console.error("Login error:", err);
+        return next(err);}
+         
+         
       res.json({ success: true, username: user.firstname }); 
     });
   })(req, res, next);
 }
-);
+)
 
+console.log('reg')
 app.post("/register",notAuth, async(req: Request, res: Response) => {
   try{
     const formdata=req.body
@@ -183,8 +239,10 @@ app.delete("/logout", (req: Request, res: Response, next) => {
       if (err) {return `server error, ${err}`}
       res.status(200).json({ message: "Logged out successfully" });});
   });
-
-app.get("/auth-status", (req, res) => {
+console.log('auth')
+console.log('inside auth')
+app.get("/auth-status", (req, res) => {res.set("Cache-Control", "no-store");
+  console.log(req.isAuthenticated())
 
   res.json({
     isLoggedin: req.isAuthenticated(),
@@ -251,6 +309,11 @@ app.get('/home',async(req: Request, res: Response)=>{
   });
 app.get('/product',async(req: Request, res: Response)=>{
   try{
+    console.log('i made it')
+    if (!req.user) {
+    res.status(401).json({ message: 'Unauthorized: No user info found' });
+    return}
+
     const isfarmer=(req.user as User).usertype===Role.farmer
     console.log(isfarmer)
     const userid=(req.user as User).id
@@ -267,7 +330,7 @@ app.get('/product',async(req: Request, res: Response)=>{
         ...(filters.name && { name: filters.name}),
         ...(filters.type && {type: filters.type }),
         ...(filters.location && { location: filters.location }),
-      },include:{farmerobj:true,reviews:true}});
+      },include:{farmer:true,review:true}});
       
       if (myproducts.length!=0){
         result='search'
@@ -321,7 +384,7 @@ app.get('/product/farmer',checkAuth,async(req: Request, res: Response)=>{
     try{
         const value=(req.user as User).id
         const myproducts = await prisma.product.
-        findMany({ where: { farmerid: value },include: { reviews: true },  });
+        findMany({ where: { farmerid: value },include: { review: true },  });
         res.json({myproducts});
         console.log('products sent')
     }catch(error){
@@ -443,7 +506,7 @@ app.get('/order',checkAuth,async(req:Request,res:Response)=>{
   console.log(req.user)
     try{
         const user=(req.user as User)
-        const myorders=await prisma.myorder.findMany({where:{userId:user.id}, include:{farmerobj:true,user:true,productobj:true}})
+        const myorders=await prisma.myorder.findMany({where:{userId:user.id}, include:{farmer:true,user:true,product:true}})
         
         res.json(myorders)
         
@@ -457,6 +520,13 @@ app.get('/order',checkAuth,async(req:Request,res:Response)=>{
         await prisma.$disconnect();
     }
 })
+console.log("Registered routes:");
+app._router.stack.forEach((r:any) => {
+  if (r.route) {
+    console.log(r.route.path);
+  }
+});
+
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on port:${PORT}`);
 });

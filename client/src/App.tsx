@@ -12,11 +12,15 @@ import ProductDetail from './productdetails';
 import { CartProvider } from './cart'
 import FarmerDetailPage from './farmerproduct';
 
+
 function App(){
+  console.log(import.meta.env.MODE)
   return(<>
+  
   <AuthProvider>
+    
   <CartProvider>
-  <Router>
+    <Router basename={import.meta.env.MODE === 'production' ? '/Agri-marketplace-client' : '/'}>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegistrationPage />} />
@@ -29,9 +33,11 @@ function App(){
         <Route path="/tracking/:id" element={<ProtectedRoute><TrackingPage /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       </Routes>
-    </Router>
+      </Router>
+
     </CartProvider>
     </AuthProvider>
+
     
   
   </>)

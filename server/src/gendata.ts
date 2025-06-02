@@ -333,7 +333,7 @@
 //   }
 // });
 
-// app.get('/destinations/:id',async(req: Request, res: Response)=>{
+// app.get('/destinations/id',async(req: Request, res: Response)=>{
 //   try{
 //     const destinationid=req.params.id
 //     const mydestination = await mongodbPrisma.destination.
@@ -348,7 +348,7 @@
 //   }
 // });
 
-// app.get('/booking/:city',checkAuth,async(req: Request, res: Response)=>{
+// app.get('/booking/city',checkAuth,async(req: Request, res: Response)=>{
 //   try{
 //     const city=req.params.city
 //     if (!city || typeof city !== 'string') {

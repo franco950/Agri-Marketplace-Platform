@@ -29,7 +29,9 @@ function QuantityInput({ value, onChange }: { value: number, onChange: (val: num
   );
 }
 
+
 const ProductDetail: React.FC<Props> = ({ product }) => {
+  console.log(product)
   const [quantity, setQuantity] = useState(1);
   const {addToCart}=useCartContext()
   const navigate=useNavigate()
@@ -84,23 +86,25 @@ const ProductDetail: React.FC<Props> = ({ product }) => {
 
           <div className="farmer-info">
             <h3>Farmer Info</h3>
-            <p>{product.farmerobj.firstname}</p>
-            <p>Email: {product.farmerobj.email}</p>
-            <p>Phone: {product.farmerobj.phone}</p>
+           
+            <p>{product.farmer.firstname}</p>
+            <p>Email: {product.farmer.email}</p>
+            <p>Phone: {product.farmer.phone}</p>
           </div>
         </div>
       </div>
 
       <div className="reviews-section">
         <h2>Reviews</h2>
-        {product.reviews.length === 0 ? (
+        
+        {product.review.length === 0 ? (
           <p>No reviews yet.</p>
         ) : (
           <ul>
-            {product.reviews.map((review, i) => (
+            {product.review.map((rev, i) => (
               <li key={i} className="review">
-                <strong>Rating:</strong> {review.rating}<br />
-                <em>{review.comment}</em>
+                <strong>Rating:</strong> {rev.rating}<br />
+                <em>{rev.comment}</em>
               </li>
             ))}
           </ul>

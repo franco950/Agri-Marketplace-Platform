@@ -120,34 +120,49 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.FarmerScalarFieldEnum = {
+exports.Prisma.AdminScalarFieldEnum = {
   id: 'id',
   firstname: 'firstname',
   lastname: 'lastname',
   email: 'email',
   password: 'password',
-  phone: 'phone',
   isactive: 'isactive'
 };
 
 exports.Prisma.BuyerScalarFieldEnum = {
-  id: 'id',
   firstname: 'firstname',
   lastname: 'lastname',
   email: 'email',
   password: 'password',
   phone: 'phone',
-  isactive: 'isactive'
+  isactive: 'isactive',
+  id: 'id'
 };
 
-exports.Prisma.SupplierScalarFieldEnum = {
-  id: 'id',
+exports.Prisma.FarmerScalarFieldEnum = {
   firstname: 'firstname',
   lastname: 'lastname',
   email: 'email',
   password: 'password',
   phone: 'phone',
-  isactive: 'isactive'
+  isactive: 'isactive',
+  id: 'id'
+};
+
+exports.Prisma.MyorderScalarFieldEnum = {
+  id: 'id',
+  customertype: 'customertype',
+  productid: 'productid',
+  deliverylatitude: 'deliverylatitude',
+  deliverylongitude: 'deliverylongitude',
+  deliveryoption: 'deliveryoption',
+  totalcost: 'totalcost',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  tracking: 'tracking',
+  farmerid: 'farmerid',
+  userId: 'userId',
+  quantity: 'quantity'
 };
 
 exports.Prisma.ProductScalarFieldEnum = {
@@ -163,31 +178,15 @@ exports.Prisma.ProductScalarFieldEnum = {
   status: 'status',
   description: 'description',
   images: 'images',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  farmerid: 'farmerid',
+  discount: 'discount',
   locationlatitude: 'locationlatitude',
   locationlongitude: 'locationlongitude',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  discount: 'discount',
   supplierthreshold: 'supplierthreshold',
   farmerdelivery: 'farmerdelivery',
-  servicedelivery: 'servicedelivery',
-  farmerid: 'farmerid'
-};
-
-exports.Prisma.MyorderScalarFieldEnum = {
-  id: 'id',
-  customertype: 'customertype',
-  userId: 'userId',
-  productid: 'productid',
-  farmerid: 'farmerid',
-  deliverylatitude: 'deliverylatitude',
-  deliverylongitude: 'deliverylongitude',
-  deliveryoption: 'deliveryoption',
-  quantity: 'quantity',
-  totalcost: 'totalcost',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  tracking: 'tracking'
+  servicedelivery: 'servicedelivery'
 };
 
 exports.Prisma.ReviewScalarFieldEnum = {
@@ -198,21 +197,22 @@ exports.Prisma.ReviewScalarFieldEnum = {
   productid: 'productid'
 };
 
-exports.Prisma.UserScalarFieldEnum = {
-  id: 'id',
-  firstname: 'firstname',
-  isactive: 'isactive',
-  email: 'email',
-  usertype: 'usertype'
-};
-
-exports.Prisma.AdminScalarFieldEnum = {
-  id: 'id',
+exports.Prisma.SupplierScalarFieldEnum = {
   firstname: 'firstname',
   lastname: 'lastname',
   email: 'email',
   password: 'password',
-  isactive: 'isactive'
+  phone: 'phone',
+  isactive: 'isactive',
+  id: 'id'
+};
+
+exports.Prisma.UserScalarFieldEnum = {
+  firstname: 'firstname',
+  isactive: 'isactive',
+  email: 'email',
+  usertype: 'usertype',
+  id: 'id'
 };
 
 exports.Prisma.WorkerScalarFieldEnum = {
@@ -233,31 +233,42 @@ exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
-exports.Prisma.FarmerOrderByRelevanceFieldEnum = {
+exports.Prisma.adminOrderByRelevanceFieldEnum = {
   id: 'id',
   firstname: 'firstname',
   lastname: 'lastname',
   email: 'email',
-  password: 'password',
-  phone: 'phone'
+  password: 'password'
 };
 
-exports.Prisma.BuyerOrderByRelevanceFieldEnum = {
-  id: 'id',
+exports.Prisma.buyerOrderByRelevanceFieldEnum = {
   firstname: 'firstname',
   lastname: 'lastname',
   email: 'email',
   password: 'password',
-  phone: 'phone'
+  phone: 'phone',
+  id: 'id'
 };
 
-exports.Prisma.SupplierOrderByRelevanceFieldEnum = {
-  id: 'id',
+exports.Prisma.farmerOrderByRelevanceFieldEnum = {
   firstname: 'firstname',
   lastname: 'lastname',
   email: 'email',
   password: 'password',
-  phone: 'phone'
+  phone: 'phone',
+  id: 'id'
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
+exports.Prisma.myorderOrderByRelevanceFieldEnum = {
+  id: 'id',
+  productid: 'productid',
+  farmerid: 'farmerid',
+  userId: 'userId'
 };
 
 exports.Prisma.JsonNullValueFilter = {
@@ -271,7 +282,7 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
-exports.Prisma.ProductOrderByRelevanceFieldEnum = {
+exports.Prisma.productOrderByRelevanceFieldEnum = {
   id: 'id',
   name: 'name',
   variety: 'variety',
@@ -280,47 +291,54 @@ exports.Prisma.ProductOrderByRelevanceFieldEnum = {
   farmerid: 'farmerid'
 };
 
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
-};
-
-exports.Prisma.myorderOrderByRelevanceFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  productid: 'productid',
-  farmerid: 'farmerid'
-};
-
-exports.Prisma.ReviewOrderByRelevanceFieldEnum = {
+exports.Prisma.reviewOrderByRelevanceFieldEnum = {
   id: 'id',
   userId: 'userId',
   comment: 'comment',
   productid: 'productid'
 };
 
-exports.Prisma.UserOrderByRelevanceFieldEnum = {
-  id: 'id',
+exports.Prisma.supplierOrderByRelevanceFieldEnum = {
   firstname: 'firstname',
-  email: 'email'
+  lastname: 'lastname',
+  email: 'email',
+  password: 'password',
+  phone: 'phone',
+  id: 'id'
 };
 
-exports.Prisma.AdminOrderByRelevanceFieldEnum = {
+exports.Prisma.userOrderByRelevanceFieldEnum = {
+  firstname: 'firstname',
+  email: 'email',
+  id: 'id'
+};
+
+exports.Prisma.workerOrderByRelevanceFieldEnum = {
   id: 'id',
   firstname: 'firstname',
   lastname: 'lastname',
   email: 'email',
   password: 'password'
 };
-
-exports.Prisma.WorkerOrderByRelevanceFieldEnum = {
-  id: 'id',
-  firstname: 'firstname',
-  lastname: 'lastname',
-  email: 'email',
-  password: 'password'
+exports.order_customertype = exports.$Enums.order_customertype = {
+  BUYER: 'BUYER',
+  SUPPLIER: 'SUPPLIER'
 };
-exports.ProductType = exports.$Enums.ProductType = {
+
+exports.order_deliveryoption = exports.$Enums.order_deliveryoption = {
+  FARMER: 'FARMER',
+  SELF: 'SELF',
+  SERVICE: 'SERVICE'
+};
+
+exports.order_tracking = exports.$Enums.order_tracking = {
+  DELIVERED: 'DELIVERED',
+  ENROUTE: 'ENROUTE',
+  PACKING: 'PACKING',
+  PACKED: 'PACKED'
+};
+
+exports.product_type = exports.$Enums.product_type = {
   FRUIT: 'FRUIT',
   VEGETABLE: 'VEGETABLE',
   GRAIN: 'GRAIN',
@@ -332,7 +350,7 @@ exports.ProductType = exports.$Enums.ProductType = {
   OTHER: 'OTHER'
 };
 
-exports.Unit = exports.$Enums.Unit = {
+exports.product_unit = exports.$Enums.product_unit = {
   KG: 'KG',
   LITERS: 'LITERS',
   BAGS: 'BAGS',
@@ -342,7 +360,7 @@ exports.Unit = exports.$Enums.Unit = {
   OTHER: 'OTHER'
 };
 
-exports.ProductStatus = exports.$Enums.ProductStatus = {
+exports.product_status = exports.$Enums.product_status = {
   AVAILABLE: 'AVAILABLE',
   SOLD: 'SOLD',
   PENDING: 'PENDING',
@@ -350,25 +368,7 @@ exports.ProductStatus = exports.$Enums.ProductStatus = {
   RESERVED: 'RESERVED'
 };
 
-exports.DeliveryType = exports.$Enums.DeliveryType = {
-  BUYER: 'BUYER',
-  SUPPLIER: 'SUPPLIER'
-};
-
-exports.Delivery = exports.$Enums.Delivery = {
-  FARMER: 'FARMER',
-  SELF: 'SELF',
-  SERVICE: 'SERVICE'
-};
-
-exports.Tracking = exports.$Enums.Tracking = {
-  DELIVERED: 'DELIVERED',
-  ENROUTE: 'ENROUTE',
-  PACKING: 'PACKING',
-  PACKED: 'PACKED'
-};
-
-exports.Rating = exports.$Enums.Rating = {
+exports.review_rating = exports.$Enums.review_rating = {
   ONE: 'ONE',
   TWO: 'TWO',
   THREE: 'THREE',
@@ -381,7 +381,7 @@ exports.Rating = exports.$Enums.Rating = {
   TEN: 'TEN'
 };
 
-exports.Role = exports.$Enums.Role = {
+exports.user_usertype = exports.$Enums.user_usertype = {
   buyer: 'buyer',
   supplier: 'supplier',
   farmer: 'farmer',
@@ -390,15 +390,15 @@ exports.Role = exports.$Enums.Role = {
 };
 
 exports.Prisma.ModelName = {
-  Farmer: 'Farmer',
-  Buyer: 'Buyer',
-  Supplier: 'Supplier',
-  Product: 'Product',
+  admin: 'admin',
+  buyer: 'buyer',
+  farmer: 'farmer',
   myorder: 'myorder',
-  Review: 'Review',
-  User: 'User',
-  Admin: 'Admin',
-  Worker: 'Worker'
+  product: 'product',
+  review: 'review',
+  supplier: 'supplier',
+  user: 'user',
+  worker: 'worker'
 };
 
 /**
