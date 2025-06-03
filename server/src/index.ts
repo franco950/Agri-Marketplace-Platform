@@ -75,10 +75,10 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 async function findUserByEmail(email:string){
-  const myuser=await prisma.user.findUnique({where:{email:email} })
+  const myuser=await prisma.user.findUnique({where:{email:email,isactive:true}})
   if(myuser){
     const usertype=myuser.usertype
-    const userdata=await (prisma as any)[usertype].findUnique({where:{email:email} })
+    const userdata=await (prisma as any)[usertype].findUnique({where:{email:email,isactive:true} })
     return userdata}
 }
     
@@ -133,6 +133,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 function checkAuth(req:Request,res:Response,next:any){res.set("Cache-Control", "no-store");
+ 
   if (req.isAuthenticated()){return next()}
   
   return res.status(401).json({ message: "Unauthorized. Please log in." }); 
@@ -239,9 +240,9 @@ app.delete("/logout", (req: Request, res: Response, next) => {
       if (err) {return `server error, ${err}`}
       res.status(200).json({ message: "Logged out successfully" });});
   });
-console.log('auth')
-console.log('inside auth')
+
 app.get("/auth-status", (req, res) => {res.set("Cache-Control", "no-store");
+  console.log('aauth status accessed')
   console.log(req.isAuthenticated())
 
   res.json({
@@ -520,6 +521,59 @@ app.get('/order',checkAuth,async(req:Request,res:Response)=>{
         await prisma.$disconnect();
     }
 })
+app.get('/profile',checkAuth,async(req: Request, res: Response)=>{
+    try{
+        const value=(req.user as User).id
+        const usertype=(req.user as User).usertype
+        const myprofile = await (prisma as any)[usertype].
+        findUnique({ where: { id: value }  });
+        res.json(myprofile);
+        console.log(myprofile)
+
+        console.log('profile sent')
+    }catch(error){
+        console.error("Error in /profile retrieval",error);
+        res.status(500).json({message:"Internal server error"});
+    }finally {
+        await prisma.$disconnect();
+    }
+});
+app.patch('/profile',checkAuth,async(req: Request, res: Response)=>{
+    try{
+      const values=req.body
+      console.log(values)
+        const userid=(req.user as User).id
+        const usertype=(req.user as User).usertype
+        const myprofile = await (prisma as any)[usertype].
+        update({ where: { id: userid },data: values});
+        res.json(myprofile);
+
+        console.log('profile updated')
+    }catch(error){
+        console.error("Error in /profile update",error);
+        res.status(500).json({message:"Internal server error"});
+    }finally {
+        await prisma.$disconnect();
+    }
+});
+app.delete('/profile',checkAuth,async(req: Request, res: Response)=>{
+    try{
+        const userid=(req.user as User).id
+        const usertype=(req.user as User).usertype
+        const [user, myprofile] = await Promise.all([
+          (prisma as any)[usertype].update({ where: { id: userid },data: { isactive: false }}),
+          prisma.user.update({ where: {id: userid },data: { isactive: false }}),
+        ]);
+        res.json(user&&myprofile)
+
+        console.log('profile deleted')
+    }catch(error){
+        console.error("Error in /profile deletion",error);
+        res.status(500).json({message:"Internal server error"});
+    }finally {
+        await prisma.$disconnect();
+    }
+});
 console.log("Registered routes:");
 app._router.stack.forEach((r:any) => {
   if (r.route) {

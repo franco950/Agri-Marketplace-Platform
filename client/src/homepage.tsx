@@ -37,6 +37,7 @@ export type searchParams={
   type?:string;
 }
 function Homepage(){
+  console.log(url)
   const {userRole}=useAuth()
   const isfarmer=userRole===Role.farmer
   const navigate=useNavigate()
