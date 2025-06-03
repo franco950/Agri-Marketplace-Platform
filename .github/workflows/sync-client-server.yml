@@ -3,7 +3,7 @@ name: Sync Client and Server to Repo B and C
 on:
   push:
     branches:
-      - dannymain-personal
+      - main
 
 jobs:
   sync-client:
