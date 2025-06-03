@@ -3,6 +3,8 @@ import  { useState,useEffect } from 'react';
 import { useQuery,useQueryClient } from "@tanstack/react-query";
 import { Anyuser } from "./data";
 import { useAuth } from "./context/useauth";
+import Navbar from "./Navbar";
+import './profilepage.css'
 
 type Props = {
   User: Anyuser;
@@ -20,35 +22,35 @@ const dummyUser = {
 };
 const UserProfile: React.FC<Props> = ({ User, onEdit, onDelete }) => {
   return (
-    <div className="max-w-md mx-auto p-4 shadow-xl rounded-2xl bg-white space-y-4">
-      <h2 className="text-2xl font-semibold text-center">User Profile</h2>
+    <div className="user-profile">
+      <h2 className="profile-title">User Profile</h2>
 
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
+      <div className="profile-fields">
+        <div className="profile-field">
           <span><strong>First Name:</strong> {User.firstname}</span>
-          <button onClick={() => onEdit('firstname')} className="text-blue-600 text-sm">Edit</button>
+          <button onClick={() => onEdit('firstname')} className="edit-link">Edit</button>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="profile-field">
           <span><strong>Last Name:</strong> {User.lastname}</span>
-          <button onClick={() => onEdit('lastname')} className="text-blue-600 text-sm">Edit</button>
+          <button onClick={() => onEdit('lastname')} className="edit-link">Edit</button>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="profile-field">
           <span><strong>Email:</strong> {User.email}</span>
-          <button onClick={() => onEdit('email')} className="text-blue-600 text-sm">Edit</button>
+          <button onClick={() => onEdit('email')} className="edit-link">Edit</button>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="profile-field">
           <span><strong>Phone:</strong> {User.phone}</span>
-          <button onClick={() => onEdit('phone')} className="text-blue-600 text-sm">Edit</button>
+          <button onClick={() => onEdit('phone')} className="edit-link">Edit</button>
         </div>
        
       </div>
-      <div className="pt-4">
+      <div className="profile-field">
         <button
           onClick={onDelete}
-          className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition"
+          className="delete-button"
         >
           Delete Profile
         </button>
@@ -100,7 +102,7 @@ const handleSave = async () => {
   };
 
   try {
-    console.log('almost awaiting')
+    
     const response=await changeProfile(updatedFields); 
     setUser(prev => ({ ...prev, ...updatedFields }));
     setEditingField(null);
@@ -132,38 +134,29 @@ const handleSave = async () => {
   };
 
     return(<>
-    <div className="p-4">
-      {editingField ? (
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Editing {editingField}</h3>
-          <input
-            type="text"
-            value={tempValue}
-            onChange={(e) => setTempValue(e.target.value)}
-            className="border p-2 w-full rounded"
-          />
-          <div className="space-x-2">
-            <button
-              onClick={handleSave}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-              Save
-            </button>
-            <button
-              onClick={() => setEditingField(null)}
-              className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
-            >
-              Cancel
-            </button>
-          </div>
+     <div className="page-container">
+      <Navbar />
+      <main className="content-container">
+        <div className="profile-card">
+          {editingField ? (
+            <div className="edit-form">
+              <h3 className="edit-heading">Editing {editingField}</h3>
+              <input
+                type="text"
+                value={tempValue}
+                onChange={(e) => setTempValue(e.target.value)}
+                className="edit-input"
+              />
+              <div className="button-group">
+                <button onClick={handleSave} className="save-button">Save</button>
+                <button onClick={() => setEditingField(null)} className="cancel-button">Cancel</button>
+              </div>
+            </div>
+          ) : (
+            <UserProfile User={user} onEdit={handleEdit} onDelete={handleDelete} />
+          )}
         </div>
-      ) : (
-        <UserProfile
-          User={user}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
-      )}
+      </main>
     </div></>)
 }
 export default ProfilePage
