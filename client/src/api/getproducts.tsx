@@ -1,7 +1,11 @@
 import { searchParams } from "../homepage";
 import { Product } from "../data";
 const url=import.meta.env.VITE_SERVER_URL
-export async function getProductData(params:searchParams):Promise<Product[]>{
+type reply={
+    myproducts:Product[],
+    result:string
+}
+export async function getProductData(params:searchParams):Promise<reply>{
     
     try{
         const filteredParams = Object.fromEntries(
@@ -24,20 +28,21 @@ export async function getProductData(params:searchParams):Promise<Product[]>{
         credentials: "include",
     
     })
-    const {myproducts,result} = await response.json(); 
+    const reply = await response.json(); 
     if (!response.ok) { 
         const error = await response.json();
         throw new Error(error.message || "Request failed")};
-    if (!allParamsEmpty && result=='all'){
+    if (!allParamsEmpty && reply.result=='all'){
         throw new Error('no products found')}
     
-    return myproducts}
+    return reply}
     
     
     catch(error:any) {
         console.error("Error retrieving products:", error);
         throw new Error(error)} 
   }
+
   export async function getSingleProduct(params:searchParams):Promise<Product>{
     try{
         const filteredParams = Object.fromEntries(
@@ -73,6 +78,7 @@ export async function getProductData(params:searchParams):Promise<Product[]>{
         console.error("Error retrieving products:", error);
         throw new Error(error)} 
   }
+  
   export async function getCartProducts(productIds:string[]):Promise<Product[]>{
     try{
         

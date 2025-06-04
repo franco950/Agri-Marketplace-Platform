@@ -81,7 +81,9 @@ function OrderPage(){
       };
     async function handleBuy(){
         await postOrders(productOrder)
-         navigate(`/tracking/${1}`)
+        const productIds: string[] = productOrder.map((order) => order.productid);
+        productIds.forEach(id => {removeFromCart(id)}); 
+        navigate(`/tracking/${1}`)
       };
       
     return (

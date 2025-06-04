@@ -9,6 +9,7 @@ import { capitalizeFirstLetter } from './utils/general';
 import Navbar from './Navbar';
 import { useCartContext } from './cart';
 
+
 type Props = {
   product: Product;
 };
@@ -115,14 +116,13 @@ const ProductDetail: React.FC<Props> = ({ product }) => {
 };
 
 export default function ProductDetailPage() {
-     const [searchParams] = useSearchParams();
-        const type = searchParams.get('type') || '';
-        const uppername = searchParams.get('name') || '';
-        const name = capitalizeFirstLetter(uppername);
-        const location = searchParams.get('location') || '';
-        const id = searchParams.get('id') || '';
-        const queryParams = { name, type, location,id };
-        
+    const [searchParams] = useSearchParams();
+    const type = searchParams.get('type') || '';
+    const uppername = searchParams.get('name') || '';
+    const name = capitalizeFirstLetter(uppername);
+    const location = searchParams.get('location') || '';
+    const id = searchParams.get('id') || '';
+    const queryParams = { name, type, location,id };
   
     const { data: product, isLoading, error } = useQuery({
       queryKey: ['product', id],
@@ -132,13 +132,12 @@ export default function ProductDetailPage() {
   
     if (isLoading) return <p>Loading...</p>;
     if (error instanceof Error) return <p>{error.message}</p>;
-    
-    if (!product) return <p>Product not found.</p>;
+    if (!product) return <p>Products not found.</p>;
   
     return (<div className="full-container">
     <Navbar/>
     <ProductDetail product={product} />
-    </div>)
+    </div>)}
     
-  }
+  
 

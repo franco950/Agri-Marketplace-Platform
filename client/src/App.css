@@ -8,7 +8,7 @@
 }
 
 .hero {
-  background-image: url('./images/homepage.png'); /* adjust path as needed */
+  background-image: url('./images/homepage.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

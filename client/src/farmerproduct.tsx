@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './ProductDetail.css';
-import { Product, ProductType} from './data';
+import { Product,ProductType} from './data';
 import { useSearchParams} from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getSingleProduct } from './api/getproducts';
@@ -191,13 +191,12 @@ const ProductDetail: React.FC<Props> = ({ product }) => {
 
 export default function FarmerDetailPage() {
   const [searchParams] = useSearchParams();
-          const type = searchParams.get('type') || '';
-          const uppername = searchParams.get('name') || '';
-          const name = capitalizeFirstLetter(uppername);
-          const location = searchParams.get('location') || '';
-          const id = searchParams.get('id') || '';
-          const queryParams = { name, type, location,id };
-
+  const type = searchParams.get('type') || '';
+  const uppername = searchParams.get('name') || '';
+  const name = capitalizeFirstLetter(uppername);
+  const location = searchParams.get('location') || '';
+  const id = searchParams.get('id') || '';
+  const queryParams = { name, type, location,id };
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', queryParams],

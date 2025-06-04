@@ -24,6 +24,21 @@ export type Product = {
     review: Review[];
     order: Order[];
   };
+export type Productform = {
+    name: string;
+    type: ProductType;
+    unit: Unit;
+    priceperunit: number;
+    quantity: number;
+    variety: string;
+    perishdate: Date;
+    location: string;
+    description: string;
+    discount: number;
+    supplierthreshold: number;
+    farmerdelivery: boolean;
+
+  };
   // Enums
 export enum DeliveryType {
     BUYER = 'BUYER',

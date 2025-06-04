@@ -8,9 +8,7 @@ const url=import.meta.env.VITE_SERVER_URL
 
 async function getHomeData(setMessage: React.Dispatch<React.SetStateAction<string>>,
   setProducts: React.Dispatch<React.SetStateAction<any>>){
-   
   try{
-   
   const response=await fetch(`${url}/home`,{
       method: "GET",
       headers: {
@@ -37,7 +35,6 @@ export type searchParams={
   type?:string;
 }
 function Homepage(){
-  console.log(url)
   const {userRole}=useAuth()
   const isfarmer=userRole===Role.farmer
   const navigate=useNavigate()
@@ -111,7 +108,7 @@ function Homepage(){
           Connecting buyers and farmers for fair, transparent trade.
         </p>
         {isfarmer?(
-          <Link to={'/product/farmer'} className="explore-btn">View My products</Link>
+          <Link to={`/product/farmer`} className="explore-btn">View My products</Link>
         ):(
           <Link to={'/product'} className="explore-btn">Explore Marketplace</Link>)}
         

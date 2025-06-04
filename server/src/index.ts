@@ -310,7 +310,7 @@ app.get('/home',async(req: Request, res: Response)=>{
   });
 app.get('/product',async(req: Request, res: Response)=>{
   try{
-    console.log('i made it')
+   
     if (!req.user) {
     res.status(401).json({ message: 'Unauthorized: No user info found' });
     return}
@@ -339,12 +339,16 @@ app.get('/product',async(req: Request, res: Response)=>{
 
       if (!req.query || myproducts.length==0) {
      
-        const myproducts=await prisma.product.findMany({where:{...(isfarmer &&{farmerid:userid})}})
+        const myproducts=await prisma.product.findMany()
         result='all'
+        if (isfarmer){
+          
+          result='emptyfarmer'
+        }
         res.json({myproducts,result})
         
       }
-      console.log(result)
+      
     ;
     console.log('product types sent')
   }catch(error){
@@ -381,20 +385,7 @@ app.post('/product/checkout',checkAuth,async(req: Request, res: Response)=>{
   }
 });
 
-app.get('/product/farmer',checkAuth,async(req: Request, res: Response)=>{
-    try{
-        const value=(req.user as User).id
-        const myproducts = await prisma.product.
-        findMany({ where: { farmerid: value },include: { review: true },  });
-        res.json({myproducts});
-        console.log('products sent')
-    }catch(error){
-        console.error("Error in /products retrieval",error);
-        res.status(500).json({message:"Internal server error"});
-    }finally {
-        await prisma.$disconnect();
-    }
-});
+
 
 app.post('/product/farmer',checkAuth,async(req: Request, res: Response)=>{
     try{
