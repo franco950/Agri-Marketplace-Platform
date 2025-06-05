@@ -155,7 +155,7 @@ export enum Role {
     location: string;
     status: ProductStatus;
     description: string;
-    images: any;
+    images: File[];
     createdAt: string;
     updatedAt: string;
     farmerid: string;

@@ -1,13 +1,14 @@
 import { Link, useNavigate,useSearchParams } from "react-router-dom";
 import { getProductData } from "./api/getproducts";
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Product,ProductType,Role } from "./data";
 import "./products.css"
 import Navbar from "./Navbar";
 import React, { useState } from 'react';
 import { useAuth } from "./context/useauth";
 import { capitalizeFirstLetter } from "./utils/general";
-  
+const url=import.meta.env.VITE_SERVER_URL
+
   type Props = {
     products: Product[],
     result:string
@@ -33,6 +34,7 @@ import { capitalizeFirstLetter } from "./utils/general";
     const isfarmer=userRole===Role.farmer
     const[all,setAll]=useState<Boolean>(false)
     console.log(result)
+    const queryclient=useQueryClient()
 
     function handleSearch(id:string){
       const params={id:id}
@@ -47,6 +49,8 @@ import { capitalizeFirstLetter } from "./utils/general";
                 <button onClick={()=>handleAdd()}>Add a product</button></>
               )
             }
+      if (isfarmer && result=='all'){
+      queryclient.invalidateQueries({ queryKey: ['reply'] });}
   
     return (
       <div className="app">
@@ -69,7 +73,7 @@ import { capitalizeFirstLetter } from "./utils/general";
               <h2>{readableProductType(category)}</h2>
               <div className="card-container">
                 {filtered.map((product) => {
-                  const imageUrl = extractImage(product.images);
+                  const imageUrl = url+extractImage(product.images);
                   console.log(imageUrl)
                   
                   return (
@@ -106,7 +110,8 @@ import { capitalizeFirstLetter } from "./utils/general";
     const name = capitalizeFirstLetter(uppername);
     const location = searchParams.get('location') || '';
     const id = searchParams.get('id') || '';
-    const queryParams = { name, type, location,id };
+    const farmerid=searchParams.get('farmerid')||'';
+    const queryParams = { name, type, location,id,farmerid };
    
     
    

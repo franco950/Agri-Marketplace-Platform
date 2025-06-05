@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Productform, ProductType, Unit } from './data'; 
+import { Productform, ProductType, Unit,ProductStatus } from './data'; 
 import Navbar from './Navbar';
 import './newproduct.css'
+import { postProduct } from './api/postproducts';
 
 const locations = [
   'Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret',
@@ -20,12 +21,19 @@ const initialState: Productform = {
   location: '',
   discount: 0,
   supplierthreshold: 0,
-  farmerdelivery: false
+  farmerdelivery: false,
+  status: ProductStatus.AVAILABLE,
+  images:[]
 };
 
 const ProductForm: React.FC = () => {
   const [form, setForm] = useState<Productform>(initialState);
   const [errors, setErrors] = useState<{ [K in keyof Productform]?: string }>({});
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+  const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+  const [imageError, setImageError] = useState<string | null>(null);
+
 
  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
   const { name, value, type } = e.target;
@@ -48,15 +56,52 @@ const ProductForm: React.FC = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
+const handleSubmit = async (e: React.FormEvent) => {
+    const formData = new FormData();
+  e.preventDefault();
+  const validationErrors = validate();
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    return;
+  }
+
+  try {
+    if (imageFile) {
+      
+    
+    formData.append('name', form.name);
+    formData.append('type', form.type);
+    formData.append('unit', form.unit);
+    formData.append('priceperunit', form.priceperunit.toString());
+    formData.append('quantity', form.quantity.toString());
+    formData.append('variety', form.variety);
+    formData.append('perishdate', form.perishdate.toISOString());
+    formData.append('description', form.description);
+    formData.append('location', form.location);
+    formData.append('discount', form.discount.toString());
+    formData.append('supplierthreshold', form.supplierthreshold.toString());
+    formData.append('farmerdelivery', form.farmerdelivery.toString());
+    formData.append('status',form.status.toString());
+    formData.append('images',imageFile)
+    console.log(form.name)
+    for (let [key, value] of formData.entries()) {
+    console.log(`${key}:`, value);
+}
+
+
+        postProduct(formData)
+        alert("Product submitted successfully!");
+        setForm(initialState)
     }
     
-  };
+    
+
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong!");
+  }
+};
+
 
   return (
     <form onSubmit={handleSubmit} className="product-form">
@@ -115,7 +160,33 @@ const ProductForm: React.FC = () => {
         <textarea name="description" value={form.description} onChange={handleChange} rows={4} />
         {errors.description && <span className="error">{errors.description}</span>}
       </label>
+      <label>
+        Product Image:
+        {imageError && <span className="error">{imageError}</span>}
 
+        <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            if (!ALLOWED_TYPES.includes(file.type)) {
+            setImageError("Only JPEG, PNG or WEBP images are allowed.");
+            setImageFile(null);
+            return;
+            }
+
+            if (file.size > MAX_FILE_SIZE) {
+            setImageError("File size must be less than 2MB.");
+            setImageFile(null);
+            return;
+            }
+            setImageError(null);
+            setImageFile(file);
+        }}
+        />
+        </label>
       <label>
         Location:
         <select name="location" value={form.location} onChange={handleChange}>
@@ -126,17 +197,14 @@ const ProductForm: React.FC = () => {
         </select>
         {errors.location && <span className="error">{errors.location}</span>}
       </label>
-
       <label>
         Supplier Discount (%):
         <input type="number" name="discount" value={form.discount} onChange={handleChange} />
       </label>
-
       <label>
         Supplier Threshold:
         <input type="number" name="supplierthreshold" value={form.supplierthreshold} onChange={handleChange} />
       </label>
-
       <label>
         Farmer Delivery(Will you facilitate order delivery for this product):
         <input type="checkbox" name="farmerdelivery" checked={form.farmerdelivery} onChange={handleChange} />
@@ -146,9 +214,6 @@ const ProductForm: React.FC = () => {
     </form>
   );
 };
-
-
-
 function NewProductPage(){
     return(<div className='full-page'>
     <Navbar/>

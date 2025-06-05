@@ -15,11 +15,13 @@ export async function getProductData(params:searchParams):Promise<reply>{
         let query;
     if (allParamsEmpty){
         query=`${url}/product`
+        
     }
     else{
         const queryString = '?'+new URLSearchParams(filteredParams as Record<string, string>).toString();
         query=`${url}/product${queryString}`
-    }
+
+    }console.log(query)
     const response=await fetch(query,{
         method: "GET",
         headers: {

@@ -108,7 +108,7 @@ function Homepage(){
           Connecting buyers and farmers for fair, transparent trade.
         </p>
         {isfarmer?(
-          <Link to={`/product/farmer`} className="explore-btn">View My products</Link>
+          <Link to={`/product/farmer?farmerid=1`} className="explore-btn">View My products</Link>
         ):(
           <Link to={'/product'} className="explore-btn">Explore Marketplace</Link>)}
         

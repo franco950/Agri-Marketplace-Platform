@@ -37,6 +37,8 @@ export type Productform = {
     discount: number;
     supplierthreshold: number;
     farmerdelivery: boolean;
+    status: ProductStatus;
+    images:File[]
 
   };
   // Enums
@@ -181,12 +183,4 @@ export enum DeliveryType {
     updatedAt: Date;
     tracking: Tracking;
   };
-  export type Anyuser = {
-    id: string;
-    firstname: string;
-    lastname: string;
-    email: string;
-    password: string;
-    phone: string;
-    
-  };
+  

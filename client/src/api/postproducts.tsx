@@ -1,17 +1,17 @@
-import { Productform } from "../data";
+
 const url=import.meta.env.VITE_SERVER_URL
-export async function postProduct(product:Productform[]):Promise<number>{
-    try{
+export async function postProduct(product:any):Promise<number>{
+    try{console.log('inside postproduct')
+        for (let [key, value] of product.entries()) {
+    console.log(`${key}:`, value);}
         
     const query=`${url}/product/farmer`
 
     const response=await fetch(query,{
         method: "POST",
-        headers: {
-          "Content-Type": "application/json", 
-        },
+    
         credentials: "include",
-        body:JSON.stringify(product)
+        body:product
        
     })
     const result = await response.json(); 

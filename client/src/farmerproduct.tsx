@@ -8,7 +8,7 @@ import Navbar from './Navbar';
 import { capitalizeFirstLetter } from './utils/general';
 import { patchProduct } from './api/getproducts';
 import { useQueryClient } from '@tanstack/react-query';
-
+const url=import.meta.env.VITE_SERVER_URL
 
 type Props = {
   product: Product;
@@ -80,11 +80,11 @@ const ProductDetail: React.FC<Props> = ({ product }) => {
     <div className="product-detail-container">
       <div className="product-detail-grid">
         <div className="product-image-section">
-          <img src={images[0] || '/placeholder.jpg'} alt={product.name} className="main-image" />
+          <img src={url+images[0] || '/placeholder.jpg'} alt={product.name} className="main-image" />
           <div className="thumbnail-row">
             {images.slice(1, 4).map((img: string, index: number) => (
               <div key={index} className="thumbnail-wrapper">
-                <img src={img} alt={`thumb-${index}`} className="thumbnail" />
+                <img src={url+img} alt={`thumb-${index}`} className="thumbnail" />
                 {isEdit && <button onClick={() => handleImageRemove(index)}>Remove</button>}
               </div>
             ))}
