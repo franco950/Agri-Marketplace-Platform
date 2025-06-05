@@ -21,7 +21,7 @@ export async function getProductData(params:searchParams):Promise<reply>{
         const queryString = '?'+new URLSearchParams(filteredParams as Record<string, string>).toString();
         query=`${url}/product${queryString}`
 
-    }console.log(query)
+    }
     const response=await fetch(query,{
         method: "GET",
         headers: {

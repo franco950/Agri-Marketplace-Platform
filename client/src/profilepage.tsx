@@ -1,23 +1,25 @@
 import { getProfile,changeProfile,deleteProfile } from "./api/profile"
 import  { useState,useEffect } from 'react';
 import { useQuery,useQueryClient } from "@tanstack/react-query";
-import { Anyuser } from "./data";
 import { useAuth } from "./context/useauth";
 import Navbar from "./Navbar";
 import './profilepage.css'
-
+type Anyuser= {
+    firstname: string;
+    lastname: string;
+    email: string;
+    phone: string;
+    
+  };
 type Props = {
   User: Anyuser;
   onEdit: (field: keyof Anyuser) => void;
   onDelete: () => void;
 };
-// Your data type
 const dummyUser = {
-  id: '123',
   firstname: 'John',
   lastname: 'Doe',
   email: 'john@example.com',
-  password: 'secret',
   phone: '123-456-7890',
 };
 const UserProfile: React.FC<Props> = ({ User, onEdit, onDelete }) => {
@@ -124,9 +126,6 @@ const handleSave = async () => {
           deleteProfile(),
           logout()
         ]);
-        
-        console.log('Profile deleted successfully, status:', status);
-        
         
     } catch (error:any) {
         alert(`Delete failed: ${error.message}`);

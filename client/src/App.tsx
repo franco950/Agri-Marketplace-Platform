@@ -14,7 +14,7 @@ import FarmerDetailPage from './farmerproduct';
 import NewProductPage from './newproductpage';
 
 function App(){
-  console.log(import.meta.env.MODE)
+  
   return(<>
   
   <AuthProvider>

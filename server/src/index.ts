@@ -161,7 +161,7 @@ async function finduserRole(userId:string){
 //   });
 // });
 app.post('/product/farmer',checkAuth, upload.array('images', 5),async(req: Request, res: Response)=>{
-    try{console.log('inside api')
+    try{
 
         const values = req.body
         const farmerid=(req.user as User).id
@@ -321,7 +321,6 @@ const buildProductFilter = (input: {
 app.get('/home',async(req: Request, res: Response)=>{
     try{
       const myproducts = await prisma.product.findMany({select:{type:true,location:true,name:true}});
-      console.log(myproducts)
       const types = [...new Set(myproducts.map(item => item.type))];
       const locations = [...new Set(myproducts.map(item => item.location))];
       const names = [...new Set(myproducts.map(item => item.name))];
@@ -534,7 +533,7 @@ app.get('/profile',checkAuth,async(req: Request, res: Response)=>{
         const value=(req.user as User).id
         const usertype=(req.user as User).usertype
         const myprofile = await (prisma as any)[usertype].
-        findUnique({ where: { id: value }  });
+        findUnique({ where: { id: value },select:{firstname:true,lastname:true,email:true,phone:true}});
         res.json(myprofile);
         console.log(myprofile)
 

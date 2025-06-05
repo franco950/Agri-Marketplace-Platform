@@ -1,5 +1,11 @@
 const url=import.meta.env.VITE_SERVER_URL
-import { Anyuser } from "../data";
+type Anyuser= {
+    firstname: string;
+    lastname: string;
+    email: string;
+    phone: string;
+    
+  };
 export async function getProfile():Promise<Anyuser>{
     try{
     const response=await fetch(`${url}/profile`,{
@@ -14,7 +20,7 @@ export async function getProfile():Promise<Anyuser>{
     if (!response.ok) { 
         const error = await response.json();
         throw new Error(error.message || "Request failed")};
-    console.log(myprofile)
+  
     
     return myprofile}
     

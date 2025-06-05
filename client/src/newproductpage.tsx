@@ -83,26 +83,17 @@ const handleSubmit = async (e: React.FormEvent) => {
     formData.append('farmerdelivery', form.farmerdelivery.toString());
     formData.append('status',form.status.toString());
     formData.append('images',imageFile)
-    console.log(form.name)
-    for (let [key, value] of formData.entries()) {
-    console.log(`${key}:`, value);
-}
 
-
-        postProduct(formData)
-        alert("Product submitted successfully!");
-        setForm(initialState)
-    }
-    
-    
+    postProduct(formData)
+    alert("Product submitted successfully!");
+    setForm(initialState)
+    } 
 
   } catch (error) {
     console.error(error);
     alert("Something went wrong!");
   }
 };
-
-
   return (
     <form onSubmit={handleSubmit} className="product-form">
       <h2>Add New Product</h2>

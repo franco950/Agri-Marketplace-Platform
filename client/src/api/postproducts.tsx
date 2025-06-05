@@ -1,9 +1,7 @@
 
 const url=import.meta.env.VITE_SERVER_URL
 export async function postProduct(product:any):Promise<number>{
-    try{console.log('inside postproduct')
-        for (let [key, value] of product.entries()) {
-    console.log(`${key}:`, value);}
+    try{
         
     const query=`${url}/product/farmer`
 

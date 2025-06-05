@@ -32,7 +32,7 @@ function QuantityInput({ value, onChange }: { value: number, onChange: (val: num
 
 
 const ProductDetail: React.FC<Props> = ({ product }) => {
-  console.log(product)
+  
   const [quantity, setQuantity] = useState(1);
   const {addToCart}=useCartContext()
   const navigate=useNavigate()
