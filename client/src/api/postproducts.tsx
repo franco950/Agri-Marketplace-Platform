@@ -1,7 +1,4 @@
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 const url=import.meta.env.VITE_SERVER_URL
 export async function postProduct(product:any):Promise<number>{
     try{
@@ -13,11 +10,7 @@ export async function postProduct(product:any):Promise<number>{
     
         credentials: "include",
         body:product
-<<<<<<< Updated upstream
-       
-=======
 
->>>>>>> Stashed changes
     })
     const result = await response.json(); 
     
