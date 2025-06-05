@@ -48,6 +48,7 @@ function Homepage(){
   const locations = products?.locations || [];
   const uppernames=products?.names || [];
   const names:string[]=uppernames.map((name: string) => name.toLowerCase());
+  const myproducts=products?.myproducts || [];
 
   
 
@@ -62,18 +63,21 @@ function Homepage(){
     )))
   }
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setMessage('')
     setParams((prevData) => ({
       ...prevData,
       type: e.target.value,
     }));
   };
   const handleLocationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setMessage('')
     setParams((prevData) => ({
       ...prevData,
       location: e.target.value,
     }));
   };
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage('')
     setParams((prevData) => ({
       ...prevData,
       name: e.target.value.toLowerCase(),
@@ -83,12 +87,24 @@ function Homepage(){
     const filteredParams = Object.fromEntries(
       Object.entries(searchParams).filter(([_, value]) => value !== '')
     );
+    const hasMatch = myproducts.some((product:any) => {
+        return (
+          (!searchParams.name|| product.name.toLowerCase() === searchParams.name) &&
+          (!searchParams.type || product.type === searchParams.type) &&
+          (!searchParams.location || product.location === searchParams.location)
+        );
+      });
     if (!searchParams.location && !searchParams.name && !searchParams.type){
       setMessage('please enter at least one parameter')
       return
     }
     else if (names!=null && searchParams.name && !names.includes(searchParams.name)){
       setMessage('no product with that name found')
+      return
+    }
+    
+    else if (!hasMatch){
+      setMessage('no product found for these parameters')
       return
     }
     

@@ -321,10 +321,11 @@ const buildProductFilter = (input: {
 app.get('/home',async(req: Request, res: Response)=>{
     try{
       const myproducts = await prisma.product.findMany({select:{type:true,location:true,name:true}});
+      console.log(myproducts)
       const types = [...new Set(myproducts.map(item => item.type))];
       const locations = [...new Set(myproducts.map(item => item.location))];
       const names = [...new Set(myproducts.map(item => item.name))];
-      res.json({locations,types,names});
+      res.json({locations,types,names,myproducts});
       console.log('homedata sent')
     }catch(error){
       console.error("Error in /home",error);
