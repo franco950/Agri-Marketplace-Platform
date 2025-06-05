@@ -1,4 +1,7 @@
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 const url=import.meta.env.VITE_SERVER_URL
 export async function postProduct(product:any):Promise<number>{
     try{
@@ -10,7 +13,11 @@ export async function postProduct(product:any):Promise<number>{
     
         credentials: "include",
         body:product
+<<<<<<< Updated upstream
        
+=======
+
+>>>>>>> Stashed changes
     })
     const result = await response.json(); 
     
@@ -21,6 +28,6 @@ export async function postProduct(product:any):Promise<number>{
     return result}
 
     catch(error:any) {
-        console.error("Errorposting product:", error);
+        console.error("Error posting product:", error);
         throw new Error(error)} 
   }
