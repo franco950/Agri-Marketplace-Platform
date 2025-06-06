@@ -8,6 +8,7 @@ import Navbar from './Navbar';
 import { capitalizeFirstLetter } from './utils/general';
 import { patchProduct } from './api/getproducts';
 import { useQueryClient } from '@tanstack/react-query';
+import { useAuth } from './context/useauth';
 const url=import.meta.env.VITE_SERVER_URL
 
 type Props = {
@@ -16,6 +17,8 @@ type Props = {
 
 const ProductDetail: React.FC<Props> = ({ product }) => {
   const [isEdit, setIsEdit] = useState(false);
+  const {userid}=useAuth()
+  const isowner=userid===product.farmerid
   const queryClient=useQueryClient()
   const [editedProduct, setEditedProduct] = useState<Product>({ ...product });
   const [images, setImages] = useState<string[]>(Array.isArray(product.images) ? product.images : []);
@@ -164,9 +167,9 @@ const ProductDetail: React.FC<Props> = ({ product }) => {
             <p>Phone: {product.farmer.phone}</p>
           </div>
 
-          <button onClick={() => setIsEdit((prev) => !prev)}>
+          {isowner&&(<button onClick={() => setIsEdit((prev) => !prev)}>
             {isEdit ? 'Cancel' : 'Edit Product'}
-          </button>
+          </button>)}
         </div>
       </div>
 

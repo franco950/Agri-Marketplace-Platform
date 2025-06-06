@@ -66,7 +66,7 @@ const url=import.meta.env.VITE_SERVER_URL
           const filtered = products.filter((p) => p.type === category);
           if (filtered.length === 0 ) {
             return null
-          };
+          }; 
           
           return (
             <div className="category" key={category}>

@@ -16,14 +16,14 @@ export default function Navbar() {
       
        
       {(userRole=='farmer')?(
-        <li><Link to="/product/farmer">my products</Link></li>
+        <li><Link to="/product/farmer?farmerid=1">my products</Link></li>
         
       ):('')}
       {isLoggedin ? (
         <>
-        <li><button className="cart-logo" onClick={()=>navigate(`/order/1`)}>{total}</button></li>
+        {userRole!=='farmer'&&<li><button className="cart-logo" onClick={()=>navigate(`/order/1`)}>{total}</button></li>}
         <li><Link to="/profile">profile</Link></li>
-        <Link to='/tracking/1'>Orders</Link>
+        <Link to='/tracking/1'>My Orders</Link>
         <li><button onClick={logout}>Logout</button></li></>
         
       ) : (

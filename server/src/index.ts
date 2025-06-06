@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import {Admin,Worker,ProductType,Delivery, Unit, ProductStatus,Farmer,farmersData,Review,
   reviewsData,Supplier,suppliersData,Buyer,buyersData,Product,productsData,User,Role,Order} from "./data";
-import { PrismaClient ,order_customertype as DeliveryType} from "../generated/prisma";
+import { PrismaClient ,order_customertype as DeliveryType, review_rating, order_tracking} from "../generated/prisma";
 import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import MySQLStoreFactory from 'express-mysql-session';
@@ -16,7 +16,19 @@ enum normaluser {
   farmer='farmer'
   
 }
+const reviewrate: { [key: number]: string }={
+  1:'ONE',
+  2:'TWO',
+  3:'THREE',
+  4:'FOUR',
+  5:'FIVE',
+  6:'SIX',
+  7:'SEVEN',
+  8:'EIGHT',
+  9:'NINE',
+  10:'TEN'
 
+}
 const app = express();
 const PORT = process.env.PORT || 5000;
 const flash=require('express-flash')
@@ -412,14 +424,11 @@ app.post('/product/checkout',checkAuth,async(req: Request, res: Response)=>{
       await prisma.$disconnect();
   }
 });
-
-
-
-
 app.patch('/product/farmer',checkAuth, upload.array('images'),async(req: Request, res: Response)=>{
     try{
      
       if (!req.body.values){console.error('no changes found');throw new Error}
+      const userid=(req.user as User).id
       const productId=req.body.id
       const values=req.body.values
     //const { productId, files, ...rest } = req.body;
@@ -439,7 +448,7 @@ app.patch('/product/farmer',checkAuth, upload.array('images'),async(req: Request
   //   images: allImages,
   // };
 
-        const myproduct= await prisma.product.update({ where:{id:productId},data: values });
+        const myproduct= await prisma.product.update({ where:{id:productId, farmerid:userid},data: values });
         res.json(myproduct);
         console.log('product modified succesfully')
     }catch(error){
@@ -484,9 +493,10 @@ app.patch('/order/farmer',checkAuth,async(req: Request, res: Response)=>{
   try{
       const orderdetails=req.body
       const farmerid=(req.user as User).id
-      const orderid=orderdetails.id
-      const updatedorder= await prisma.myorder.update({ where:{id:orderid,farmerid:farmerid}, data: orderdetails});
-      res.json({updatedorder});
+      const orderid=orderdetails.orderid
+      const trackingdetail=orderdetails.tracking
+      const updatedorder= await prisma.myorder.update({ where:{id:orderid,farmerid:farmerid}, data: {tracking:trackingdetail}});
+      res.json(updatedorder);
       console.log('order sent')
   }catch(error){
       console.error("Error in sending order",error);
@@ -495,26 +505,32 @@ app.patch('/order/farmer',checkAuth,async(req: Request, res: Response)=>{
       await prisma.$disconnect();
   }
 });
-app.get('/order/farmer',checkAuth,async(req:Request,res:Response)=>{
+
+app.get('/order',checkAuth,async(req:Request,res:Response)=>{
+ 
     try{
         const userid=(req.user as User).id
-        const myorders=await prisma.myorder.findMany({where:{farmerid:userid}})
-        res.json({myorders})
-        console.log('orders retrieved')
-
-    }catch(error){
-        console.error("Error in retrieving orders",error);
-        res.status(500).json({message:"Internal server error"});
-    }
-    finally{
-        await prisma.$disconnect();
-    }
-})
-app.get('/order',checkAuth,async(req:Request,res:Response)=>{
-  console.log(req.user)
-    try{
-        const user=(req.user as User)
-        const myorders=await prisma.myorder.findMany({where:{userId:user.id}, include:{farmer:true,user:true,product:true}})
+        const isfarmer=(req.user as User).usertype==Role.farmer
+        
+        let myorders;
+        const orderids:string[]=[];
+        const reviewids:string[]=[];
+        let missingreviews:string[]=[];
+        
+        if (!isfarmer){
+         myorders=await prisma.myorder.findMany({where:{userId:userid}, include:{farmer:true,user:true,product:true}})
+         myorders.forEach(order => {if (order.tracking===order_tracking.DELIVERED){orderids.push(order.id)}});
+          const myreviews=await prisma.review.findMany({where:{id:{in:orderids}}})
+          myreviews.forEach(review => {reviewids.push(review.id)});
+          missingreviews = orderids.filter(item => !reviewids.includes(item));
+          myorders={myorders,missingreviews}
+        }else{ 
+          myorders=await prisma.myorder.findMany({where:{farmerid:userid},include:{farmer:true,user:true,product:true}})
+          myorders={myorders,missingreviews}
+        }
+          
+          
+          
         
         res.json(myorders)
         
@@ -580,6 +596,31 @@ app.delete('/profile',checkAuth,async(req: Request, res: Response)=>{
     }finally {
         await prisma.$disconnect();
     }
+});
+app.post('/product/review',checkAuth,async(req: Request, res: Response)=>{
+
+  try{
+      const value=(req.user as User).id
+      const orderid=req.body.orderId
+      const rating:number=req.body.rating
+      const label=reviewrate[rating]
+      if (!label) throw new Error('Invalid rating');
+      const comment:string=req.body.comment
+      const myorder=await prisma.myorder.findUnique({where:{id:orderid}})
+      if (!myorder) throw new Error('order not found');
+      const productid=myorder.productid
+      const existing=await prisma.review.findFirst({where:{id:orderid}})
+      if(existing){throw new Error('user has already reviewed this order!');}
+      const myreview =await prisma.review.create({ data:{id:orderid,userId:value,rating:label as review_rating,
+        comment:comment,productid:productid} })
+      console.log(myreview)
+      res.json(myreview);
+      
+      console.log('review created')
+  }catch(error){
+      console.error("Error in review creation",error);
+      res.status(500).json({message:"Internal server error"});}
+ 
 });
 console.log("Registered routes:");
 app._router.stack.forEach((r:any) => {
