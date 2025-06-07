@@ -37,7 +37,7 @@ const ProductDetail: React.FC<Props> = ({ product }) => {
   const {addToCart}=useCartContext()
   const navigate=useNavigate()
   const images = Array.isArray(product.images) ? product.images : [];
-  const imageUrl = url+images.length > 0 ? images[0] : '/placeholder.jpg';
+  const imageUrl = images.length > 0 ? url+images[0] : '/placeholder.jpg';
 
   function handleOrder(productid:string,quantity:number){
     addToCart(productid,quantity)

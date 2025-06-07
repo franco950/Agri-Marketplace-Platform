@@ -75,9 +75,10 @@ const { mutate: updateOrderStatus } = useMutation({
       Tracking.ENROUTE,
       Tracking.DELIVERED,
     ];
-    let missingReviewIds:string[]=orders[1];
- 
-  let myorders:Order[]=orders[0]
+    const [myorders, missingReviewIds] = Array.isArray(orders) && orders.length === 2
+  ? orders
+  : [[], []];
+
   let values:Order[];
   const getStatusIndex = (status:Tracking) => statuses.indexOf(status);
   const pendingorders = myorders.filter((order) => order.tracking !== Tracking.DELIVERED);
@@ -94,7 +95,7 @@ useEffect(() => {
       setShowReviewModal(true);
     }
   }
-}, [ missingReviewIds]);
+}, [isfarmer, delivered, showReviewModal, missingReviewIds]);
 
 
   function handlefilter(status:status){
@@ -144,6 +145,7 @@ async function handleSubmitReview() {
             <p><strong>Delivery Option:</strong> {order.deliveryoption}</p>
             <p><strong>Quantity: </strong>{order.totalcost/order.product.priceperunit} {order.product.unit}</p>
             <p><strong>Total Cost:</strong> KES {order.totalcost}</p>
+            <p><strong>Delivery:</strong> {order.deliveryoption}</p>
             <p><strong>Order Date: </strong>{new Date(order.createdAt).toDateString()}</p>
             
 

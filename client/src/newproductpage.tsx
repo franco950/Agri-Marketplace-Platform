@@ -3,7 +3,7 @@ import { Productform, ProductType, Unit,ProductStatus } from './data';
 import Navbar from './Navbar';
 import './newproduct.css'
 import { postProduct } from './api/postproducts';
-
+import { useNavigate } from 'react-router-dom';
 const locations = [
   'Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret',
   'Thika', 'Meru', 'Kitale', 'Nyeri', 'Machakos'
@@ -33,8 +33,7 @@ const ProductForm: React.FC = () => {
   const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
   const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
   const [imageError, setImageError] = useState<string | null>(null);
-
-
+  const navigate=useNavigate()
  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
   const { name, value, type } = e.target;
   const isCheckbox = (el: any): el is HTMLInputElement => el.type === 'checkbox';
@@ -87,6 +86,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     postProduct(formData)
     alert("Product submitted successfully!");
     setForm(initialState)
+    navigate(`/product/farmer?farmerid=1`)
     } 
 
   } catch (error) {
@@ -178,7 +178,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         }}
         />
         </label>
-      <label>
+      {/* <label>
         Location:
         <select name="location" value={form.location} onChange={handleChange}>
           <option value="">Select a town</option>
@@ -187,7 +187,19 @@ const handleSubmit = async (e: React.FormEvent) => {
           ))}
         </select>
         {errors.location && <span className="error">{errors.location}</span>}
+      </label> */}
+      <label>
+        Location:
+        <input
+          type="text"
+          name="location"
+          value={form.location}
+          onChange={handleChange}
+          placeholder="Enter town"
+        />
+        {errors.location && <span className="error">{errors.location}</span>}
       </label>
+
       <label>
         Supplier Discount (%):
         <input type="number" name="discount" value={form.discount} onChange={handleChange} />

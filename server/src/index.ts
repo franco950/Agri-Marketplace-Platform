@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import {Admin,Worker,ProductType,Delivery, Unit, ProductStatus,Farmer,farmersData,Review,
   reviewsData,Supplier,suppliersData,Buyer,buyersData,Product,productsData,User,Role,Order} from "./data";
-import { PrismaClient ,order_customertype as DeliveryType, review_rating, order_tracking} from "../generated/prisma";
+import { PrismaClient ,order_customertype as DeliveryType, order_deliveryoption,review_rating, order_tracking} from "../generated/prisma";
 import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import MySQLStoreFactory from 'express-mysql-session';
@@ -524,6 +524,9 @@ app.patch('/api/products/:id/remove-image', async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+function mapDeliveryToOrderDeliveryOption(delivery: Delivery): order_deliveryoption {
+  return order_deliveryoption[delivery as unknown as keyof typeof order_deliveryoption];
+}
 
 app.post('/order',checkAuth,async(req: Request, res: Response)=>{
 
@@ -539,6 +542,7 @@ app.post('/order',checkAuth,async(req: Request, res: Response)=>{
           orderdetails.forEach((element:any) => {
             element.customertype=toDeliveryType(role.toUpperCase())
             element.userId=myuser.id
+            element.deliveryoption= mapDeliveryToOrderDeliveryOption(element.deliveryoption);
           });
         }
         const neworder= await prisma.myorder.createMany({ data: orderdetails});

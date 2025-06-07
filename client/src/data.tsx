@@ -60,6 +60,7 @@ export enum DeliveryType {
     SERVICE = 'SERVICE'
   }
   
+  
   export enum Rating {
     ONE = 'ONE',
     TWO = 'TWO',

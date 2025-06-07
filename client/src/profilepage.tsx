@@ -4,6 +4,7 @@ import { useQuery,useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "./context/useauth";
 import Navbar from "./Navbar";
 import './profilepage.css'
+
 type Anyuser= {
     firstname: string;
     lastname: string;
@@ -24,7 +25,9 @@ const dummyUser = {
 };
 const UserProfile: React.FC<Props> = ({ User, onEdit, onDelete }) => {
   return (
+    
     <div className="user-profile">
+      
       <h2 className="profile-title">User Profile</h2>
 
       <div className="profile-fields">

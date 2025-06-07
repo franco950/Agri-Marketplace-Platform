@@ -77,4 +77,7 @@
   .confirm-button:hover {
     background-color: #225e5e;
   }
-  
+  .checkbox-label{
+    color:black;
+    font-size: medium;
+  }

@@ -101,3 +101,17 @@
   margin-top: 20px;
   cursor: pointer;
 }
+.cart-image{
+  width: 25px;
+  height: 25px;
+}
+.cart-quantity{
+  top:0;
+  height: 17px;
+  padding-left: 10px;
+
+}
+.image-container{
+  width: 25px;
+  height: 35px;
+}
