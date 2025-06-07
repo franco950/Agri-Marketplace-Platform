@@ -110,30 +110,28 @@ export async function getProductData(params:searchParams):Promise<reply>{
         throw new Error(error)} 
   }
 
-    export async function patchProduct(values:any,id:string):Promise<Product>{
-    try{
-        
-    const query=`${url}/product/farmer`
+export async function patchProduct(changedFields: any, id: string, files: File[]): Promise<Product> {
+  const formData = new FormData();
 
-    
-    const response=await fetch(query,{
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json", 
-        },
-        credentials: "include",
-        body: JSON.stringify({values,id})
-    
-    
-    })
-    const myproduct = await response.json(); 
-    if (!response.ok) { 
-        const error = await response.json();
-        throw new Error(error.message || "Request failed")};
-   
-    return myproduct}
+  formData.append("id", id);
+  formData.append("changedFields", JSON.stringify(changedFields)); 
 
-    catch(error:any) {
-        console.error("Error updating product:", error);
-        throw new Error(error)} 
+  // append new files
+  files.forEach((file, index) => {
+    formData.append("images", file);
+  });
+
+  const response = await fetch(`${url}/product/farmer`, {
+    method: "PATCH",
+    credentials: "include",
+    body: formData,
+  });
+
+  const myproduct = await response.json();
+
+  if (!response.ok) {
+    throw new Error(myproduct.message || "Request failed");
   }
+
+  return myproduct;
+}

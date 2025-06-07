@@ -62,7 +62,7 @@ const { mutate: updateOrderStatus } = useMutation({
       } = useQuery({
         queryKey: ['orders'],
         queryFn: () => getOrders(),
-        staleTime: 1000 * 60 ,
+        staleTime: 1000 * 10 ,
       });
     
     if (isLoading) return <p>Loading...</p>;
@@ -142,7 +142,9 @@ async function handleSubmitReview() {
             <p><strong>Buyer:</strong> {order.user.firstname || 'N/A'}</p>
             <p><strong>Farmer:</strong> {order.farmer.firstname}</p>
             <p><strong>Delivery Option:</strong> {order.deliveryoption}</p>
+            <p><strong>Quantity: </strong>{order.totalcost/order.product.priceperunit} {order.product.unit}</p>
             <p><strong>Total Cost:</strong> KES {order.totalcost}</p>
+            <p><strong>Order Date: </strong>{new Date(order.createdAt).toDateString()}</p>
             
 
             <div className="progress-labels-container">

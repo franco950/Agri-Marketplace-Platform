@@ -424,45 +424,107 @@ app.post('/product/checkout',checkAuth,async(req: Request, res: Response)=>{
       await prisma.$disconnect();
   }
 });
-app.patch('/product/farmer',checkAuth, upload.array('images'),async(req: Request, res: Response)=>{
-    try{
-     
-      if (!req.body.values){console.error('no changes found');throw new Error}
-      const userid=(req.user as User).id
-      const productId=req.body.id
-      const values=req.body.values
-    //const { productId, files, ...rest } = req.body;
-   // const uploadedFiles = req.files as Express.Multer.File[];
+app.patch('/product/farmer',checkAuth,upload.array('images', 5),async (req: Request, res: Response) => {
+    try {
+      const userid = (req.user as User).id;
+      const productId = req.body.id;
 
-  //   const existingImages = Array.isArray(req.body.existingImages)
-  //     ? req.body.existingImages
-  //     : [req.body.existingImages];
+      if (!req.body.changedFields) {
+        console.error('No changes found');
+       throw res.status(400).json({ message: 'No changes found' });
+      }
 
-  //   const newImageUrls = uploadedFiles.map(
-  //     (file) => `/images/${file.filename}`
-  //   );
+      // Parse changedfields JSON safely
+      const changedFields = JSON.parse(req.body.changedFields);
 
-  //   const allImages = [...existingImages, ...newImageUrls];
-  //   const values = {
-  //   ...rest,
-  //   images: allImages,
-  // };
+      // Handle image uploads
+      const uploadedImageUrls = (req.files as Express.Multer.File[]).map(
+        (file) => `/uploads/${file.filename}`
+      );
 
-        const myproduct= await prisma.product.update({ where:{id:productId, farmerid:userid},data: values });
-        res.json(myproduct);
-        console.log('product modified succesfully')
-    }catch(error){
-        console.error("Error in /products modification",error);
-        res.status(500).json({message:"Internal server error"});
-    }finally {
-        await prisma.$disconnect();
+      // Combine new and existing images
+      let finalImages: string[] = [];
+      if (Array.isArray(changedFields.existingImages)) {
+        finalImages = [...changedFields.existingImages, ...uploadedImageUrls];
+      } else if (changedFields.existingImages) {
+        finalImages = [changedFields.existingImages, ...uploadedImageUrls];
+      } else {
+        finalImages = [...uploadedImageUrls];
+      }
+
+      // Remove the helper field so Prisma doesn't throw
+      delete changedFields.existingImages;
+
+      // Handle numeric and boolean parsing
+      const cleanedValues = {
+        ...changedFields,
+        priceperunit: changedFields.priceperunit ? parseFloat(changedFields.priceperunit) : undefined,
+        quantity: changedFields.quantity ? parseInt(changedFields.quantity, 10) : undefined,
+        discount: changedFields.discount ? parseFloat(changedFields.discount) : undefined,
+        supplierthreshold: changedFields.supplierthreshold ? parseInt(changedFields.supplierthreshold, 10) : undefined,
+        farmerdelivery: changedFields.farmerdelivery === 'true' || changedFields.farmerdelivery === true,
+        servicedelivery: changedFields.servicedelivery === 'true' || changedFields.servicedelivery === true,
+        images: finalImages,
+      };
+
+      const updatedProduct = await prisma.product.update({
+        where: { id: productId, farmerid: userid },
+        data: cleanedValues,
+      });
+
+      res.json(updatedProduct);
+      console.log('Product updated successfully');
+    } catch (error) {
+      console.error('Error in /product/farmer PATCH:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    } finally {
+      await prisma.$disconnect();
     }
-});
+  }
+);
+
 function toDeliveryType(value: string): DeliveryType | undefined {
   return Object.values(DeliveryType).includes(value as DeliveryType)
     ? (value as DeliveryType)
     : undefined;
 }
+app.patch('/api/products/:id/remove-image', async (req, res) => {
+  console.log('im in remove image')
+  const productId = req.params.id;
+  const { image } = req.body;
+
+  if (!image){ throw res.status(400).json({ error: "No image provided" });}
+
+  try {
+    // 1. Remove image from product record
+    const product = await prisma.product.findUnique({where:{id:productId}});
+    if (!product) throw res.status(404).json({ error: "Product not found" });
+    if (!product.images) throw res.status(404).json({ error: "images not found" });
+    const newimages = (product.images as string[]).filter(img => img !== image);
+    await prisma.product.update({where:{id:productId},data:{images:newimages}})
+  
+    // 2. Remove image file from server
+    const fs = require('fs');
+    const path = require('path');
+    const cleanedImage = image.replace(/^\/?uploads[\\/]/, '');
+    const rootDir = path.resolve(__dirname, '..');
+    const imagePath = path.join(rootDir, 'uploads', cleanedImage);
+
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+      console.log('Image deleted:', imagePath);
+    } else {
+      console.warn('Image not found:', imagePath);
+    }
+
+    res.status(200).json({ success: true });
+
+  } catch (error) {
+    console.error("Image removal failed:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.post('/order',checkAuth,async(req: Request, res: Response)=>{
 
     try{

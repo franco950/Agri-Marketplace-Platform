@@ -16,6 +16,7 @@ type Props = {
 };
 
 const ProductDetail: React.FC<Props> = ({ product }) => {
+  const [imageFiles, setImageFiles] = useState<File[]>([]); 
   const [isEdit, setIsEdit] = useState(false);
   const {userid}=useAuth()
   const isowner=userid===product.farmerid
@@ -44,53 +45,90 @@ const ProductDetail: React.FC<Props> = ({ product }) => {
   }
   return changes;
 }
+const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (e.target.files) {
+    const files = Array.from(e.target.files);
+    const previews = files.map(file => URL.createObjectURL(file));
+
+    setImageFiles(prev => [...prev, ...files]); 
+    setImages(prev => [...prev, ...previews]);  
+  }
+};
 
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newImages = Array.from(e.target.files).map((file) => URL.createObjectURL(file));
-      setImages((prev) => [...prev, ...newImages]);
-    }
-  };
+  const handleImageRemove = async (index: number) => {
+  const imageToRemove = images[index];
 
-  const handleImageRemove = (index: number) => {
+  // Confirm before deleting
+  const confirm = window.confirm("Are you sure you want to delete this image?");
+  if (!confirm) return;
+
+  try {
+    // Call backend to delete image
+    await fetch(`${url}/api/products/${product.id}/remove-image`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },credentials:'include',
+      body: JSON.stringify({ image: imageToRemove }),
+    });
+
+    // Update frontend state after successful deletion
     setImages((prev) => prev.filter((_, i) => i !== index));
-  };
+  } catch (error) {
+    console.error("Failed to delete image:", error);
+    alert("Failed to delete image. Please try again.");
+  }
+};
+const handleSave = async () => {
+  const productWithImages = { ...editedProduct, images };
+  const changedFields = getChangedFields(product, productWithImages);
 
-  const handleSave = async() => {
-    const changedFields = getChangedFields(product, editedProduct);
+  if (Object.keys(changedFields).length === 0) {
+    alert("No changes to save.");
+    return;
+  }
 
-    if (Object.keys(changedFields).length === 0) {
-        alert("No changes to save.");
-        return;
-    }
-    try {
-    
-        await patchProduct(changedFields,product.id)
-        alert("Product updated successfully");
-        setIsEdit(false);
-        const params={id:product.id}
-        queryClient.invalidateQueries({ queryKey: ['product', params] });
-        
-    } catch (err) {
-        console.error(err);
-        alert(err);
-    }}
-   
-    
-
+  try {
+  
+    await patchProduct(changedFields, product.id, imageFiles);
+    alert("Product updated successfully");
+    setIsEdit(false);
+    const params = { id: product.id };
+    queryClient.invalidateQueries({ queryKey: ['product', params] });
+  } catch (err) {
+    console.error(err);
+    alert("Failed to save changes");
+  }
+};
   return (
     <div className="product-detail-container">
       <div className="product-detail-grid">
         <div className="product-image-section">
-          <img src={url+images[0] || '/placeholder.jpg'} alt={product.name} className="main-image" />
+          <div className="main-image-wrapper">
+            <img
+              src={images[0] ? url + images[0] : url+'/uploads/placeholder.jpg'}
+              
+              alt={product.name}
+              className="main-image" 
+            />
+            {isEdit && images[0] && (
+              <button onClick={() => handleImageRemove(0)}>Remove</button>
+            )}
+          </div>
+
           <div className="thumbnail-row">
-            {images.slice(1, 4).map((img: string, index: number) => (
-              <div key={index} className="thumbnail-wrapper">
-                <img src={url+img} alt={`thumb-${index}`} className="thumbnail" />
-                {isEdit && <button onClick={() => handleImageRemove(index)}>Remove</button>}
-              </div>
-            ))}
+            {images.slice(1, 4).map((img: string, index: number) => {
+              const actualIndex = index + 1; 
+              return (
+                <div key={actualIndex} className="thumbnail-wrapper">
+                  <img src={url + img} alt={`thumb-${index}`} className="thumbnail" />
+                  {isEdit && (
+                    <button onClick={() => handleImageRemove(actualIndex)}>Remove</button>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
           {isEdit && (
@@ -99,6 +137,7 @@ const ProductDetail: React.FC<Props> = ({ product }) => {
             </div>
           )}
         </div>
+
 
         <div className="product-info-section">
           {isEdit ? (
