@@ -108,6 +108,7 @@ const handleSave = async () => {
           <div className="main-image-wrapper">
             <img
               src={images[0] ? url + images[0] : url+'/uploads/placeholder.jpg'}
+             
               
               alt={product.name}
               className="main-image" 

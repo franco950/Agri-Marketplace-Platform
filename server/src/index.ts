@@ -571,45 +571,54 @@ app.patch('/order/farmer',checkAuth,async(req: Request, res: Response)=>{
       await prisma.$disconnect();
   }
 });
+app.get('/order', checkAuth, async (req: Request, res: Response) => {
+  try {
+    const userid = (req.user as User).id;
+    const isfarmer = (req.user as User).usertype === Role.farmer;
 
-app.get('/order',checkAuth,async(req:Request,res:Response)=>{
- 
-    try{
-        const userid=(req.user as User).id
-        const isfarmer=(req.user as User).usertype==Role.farmer
-        
-        let myorders;
-        const orderids:string[]=[];
-        const reviewids:string[]=[];
-        let missingreviews:string[]=[];
-        
-        if (!isfarmer){
-         myorders=await prisma.myorder.findMany({where:{userId:userid}, include:{farmer:true,user:true,product:true}})
-         myorders.forEach(order => {if (order.tracking===order_tracking.DELIVERED){orderids.push(order.id)}});
-          const myreviews=await prisma.review.findMany({where:{id:{in:orderids}}})
-          myreviews.forEach(review => {reviewids.push(review.id)});
-          missingreviews = orderids.filter(item => !reviewids.includes(item));
-          myorders={myorders,missingreviews}
-        }else{ 
-          myorders=await prisma.myorder.findMany({where:{farmerid:userid},include:{farmer:true,user:true,product:true}})
-          myorders={myorders,missingreviews}
+    let orders;
+    const orderids: string[] = [];
+    const reviewids: string[] = [];
+    let missingreviews: string[] = [];
+
+    if (!isfarmer) {
+      orders = await prisma.myorder.findMany({
+        where: { userId: userid },
+        include: { farmer: true, user: true, product: true },
+      });
+
+      orders.forEach(order => {
+        if (order.tracking === order_tracking.DELIVERED) {
+          orderids.push(order.id);
         }
-          
-          
-          
-        
-        res.json(myorders)
-        
-        console.log('orders retrieved')
+      });
 
-    }catch(error){
-        console.error("Error in retrieving orders",error);
-        res.status(500).json({message:"Internal server error"});
+      const myreviews = await prisma.review.findMany({
+        where: { id: { in: orderids } },
+      });
+
+      myreviews.forEach(review => reviewids.push(review.id));
+      missingreviews = orderids.filter(item => !reviewids.includes(item));
+    } else {
+      orders = await prisma.myorder.findMany({
+        where: { farmerid: userid },
+        include: { farmer: true, user: true, product: true },
+      });
     }
-    finally{
-        await prisma.$disconnect();
-    }
-})
+
+     res.json({
+      orders,
+      missingreviews
+    });
+
+  } catch (error) {
+    console.error("Error in retrieving orders", error);
+    res.status(500).json({ message: "Internal server error" });
+  } finally {
+    await prisma.$disconnect();
+  }
+});
+
 app.get('/profile',checkAuth,async(req: Request, res: Response)=>{
     try{
         const value=(req.user as User).id
