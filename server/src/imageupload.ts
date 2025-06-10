@@ -1,33 +1,51 @@
+
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
+import sharp from 'sharp';
 
-// Set storage engine
+const tempUploadDir = './uploads/temp';
+const finalUploadDir = './uploads';
+
+if (!fs.existsSync(tempUploadDir)) fs.mkdirSync(tempUploadDir, { recursive: true });
+if (!fs.existsSync(finalUploadDir)) fs.mkdirSync(finalUploadDir, { recursive: true });
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, './uploads'); 
+    cb(null, tempUploadDir);
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    const uniqueName = `${Date.now()}-${file.fieldname}${ext}`;
+    const baseName = path.basename(file.originalname, ext);
+    const uniqueName = `${Date.now()}-${baseName}${ext}`;
     cb(null, uniqueName);
   }
 });
 
-// Filter for image file types
 const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  const allowedTypes = ['image/jpeg', 'image/png'];
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Only JPEG, PNG, or WEBP files are allowed.'));
+    cb(new Error('Only JPEG or PNG files are allowed.'));
   }
 };
 
-// Max file size: 2MB
 const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+  limits: { fileSize: 2 * 1024 * 1024 },
 });
+
+export async function convertToWebP(inputPath: string, outputName: string): Promise<string> {
+  const outputPath = path.join(finalUploadDir, `${outputName}.webp`);
+
+  await sharp(inputPath)
+    .webp({ quality: 80 })
+    .toFile(outputPath);
+
+  
+  return outputPath;
+}
 
 export default upload;

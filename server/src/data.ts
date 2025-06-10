@@ -1,26 +1,5 @@
 
-// // Enums
-// export enum ProductType {
-//     FRUIT = "FRUIT",
-//     VEGETABLE = "VEGETABLE",
-//     GRAIN = "GRAIN",
-//     LEGUME = "LEGUME",
-//     TUBER = "TUBER",
-//     DAIRY = "DAIRY",
-//     MEAT = "MEAT",
-//     POULTRY = "POULTRY",
-//     OTHER = "OTHER"
-//   }
-  
-//   export enum Unit {
-//     KG = "KG",
-//     LITERS = "LITERS",
-//     BAGS = "BAGS",
-//     CRATES = "CRATES",
-//     BUNCHES = "BUNCHES",
-//     PIECES = "PIECES",
-//     OTHER = "OTHER"
-//   }
+// Enums
 export enum ProductType {
   CEREAL = "CEREAL",
   FRUIT = "FRUIT",
@@ -56,7 +35,6 @@ export enum Unit {
   TOOLS = "TOOLS",
   OTHER = "OTHER"
 }
-  
   
   export enum ProductStatus {
     AVAILABLE = "AVAILABLE",

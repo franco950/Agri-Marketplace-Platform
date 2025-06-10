@@ -188,34 +188,6 @@
   
 //   resetAllPasswords();
 ///////////////////////////addusers
-// async function addProducts() {
-//     try {
-//       const allbuyers = await prisma.buyer.findMany();
-//       const allsuppliers=await prisma.supplier.findMany();
-//       const allfarmers=await prisma.farmer.findMany();
-//       if (!allsuppliers || !allbuyers || !allfarmers) {
-//         console.log("Products not created");
-//         return;
-//       } else {
-//         for (const single of allbuyers) {
-//           const { lastname, password, phone, ...newbuyer } = single;
-//           await prisma.user.create({
-//             data: {...newbuyer,usertype: 'buyer', },});}
-//         for (const single of allfarmers) {
-//           const { lastname, password, phone, ...newbuyer } = single;
-//           await prisma.user.create({
-//             data: {...newbuyer,usertype: 'farmer', },});}
-//         for (const single of allsuppliers) {
-//           const { lastname, password, phone, ...newbuyer } = single;
-//           await prisma.user.create({
-//             data: {...newbuyer,usertype: 'supplier', },});}
-//         console.log("Products created successfully");}
-//     } catch (error) {
-//       console.error("Error in addProducts function:", error);
-//     }
-//   }
-  
-//   addProducts();
 
 
 // ..............................................................

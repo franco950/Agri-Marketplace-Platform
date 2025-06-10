@@ -8,7 +8,8 @@ import { PrismaClient ,order_customertype as DeliveryType, order_deliveryoption,
 import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import MySQLStoreFactory from 'express-mysql-session';
-import upload from "./imageupload";
+import upload,{convertToWebP} from "./imageupload";
+import path from "path";
 const router = express.Router();
 enum normaluser {
   buyer='buyer',
@@ -178,8 +179,15 @@ app.post('/product/farmer',checkAuth, upload.array('images', 5),async(req: Reque
         const values = req.body
         const farmerid=(req.user as User).id
         const imageurls:any=[];
-        (req.files as Express.Multer.File[]).forEach((file) => {
-        imageurls.push(`/uploads/${file.filename}`);});
+        const files = req.files as Express.Multer.File[];
+        for (const file of files) {
+          const filenameWithoutExt = file.filename.replace(path.extname(file.filename), '');
+
+          const outputWebPPath = await convertToWebP(file.path, filenameWithoutExt);
+
+          const relativeWebPPath = outputWebPPath.replace(/\\/g, '/').replace(/^.*\/uploads\//, '/uploads/');
+          imageurls.push('/'+relativeWebPPath);
+        }
         const productData = {
        ...values,
         priceperunit: parseFloat( values.priceperunit),
