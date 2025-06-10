@@ -147,17 +147,28 @@ enum review_rating {
   NINE
   TEN
 }
-
-enum product_type {
-  FRUIT
-  VEGETABLE
-  GRAIN
+ enum product_type {
+  CEREAL
+  FRUIT 
+  VEGETABLE 
   LEGUME
   TUBER
+  HERB
+  SPICE
+  NUT_AND_SEED 
   DAIRY
-  MEAT
-  POULTRY
-  OTHER
+  LIVESTOCK
+  POULTRY 
+  AQUACULTURE
+  HONEY_AND_BEE
+  FLOWER_AND_ORNAMENTAL 
+  ANIMAL_FEED 
+  AGROCHEMICAL 
+  FARM_TOOL_EQUIPMENT
+  PROCESSED_FOOD 
+  BEVERAGE_CROP
+  FIBER_CROP
+  OTHER 
 }
 
 enum user_usertype {
@@ -169,12 +180,15 @@ enum user_usertype {
 }
 
 enum product_unit {
-  KG
-  LITERS
-  BAGS
+  KG 
+  LITERS 
+  BAGS 
   CRATES
   BUNCHES
   PIECES
+  ANIMALS 
+  PACKETS 
+  TOOLS 
   OTHER
 }
 

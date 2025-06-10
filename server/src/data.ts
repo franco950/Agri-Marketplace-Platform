@@ -1,26 +1,62 @@
 
-// Enums
-export enum ProductType {
-    FRUIT = "FRUIT",
-    VEGETABLE = "VEGETABLE",
-    GRAIN = "GRAIN",
-    LEGUME = "LEGUME",
-    TUBER = "TUBER",
-    DAIRY = "DAIRY",
-    MEAT = "MEAT",
-    POULTRY = "POULTRY",
-    OTHER = "OTHER"
-  }
+// // Enums
+// export enum ProductType {
+//     FRUIT = "FRUIT",
+//     VEGETABLE = "VEGETABLE",
+//     GRAIN = "GRAIN",
+//     LEGUME = "LEGUME",
+//     TUBER = "TUBER",
+//     DAIRY = "DAIRY",
+//     MEAT = "MEAT",
+//     POULTRY = "POULTRY",
+//     OTHER = "OTHER"
+//   }
   
-  export enum Unit {
-    KG = "KG",
-    LITERS = "LITERS",
-    BAGS = "BAGS",
-    CRATES = "CRATES",
-    BUNCHES = "BUNCHES",
-    PIECES = "PIECES",
-    OTHER = "OTHER"
-  }
+//   export enum Unit {
+//     KG = "KG",
+//     LITERS = "LITERS",
+//     BAGS = "BAGS",
+//     CRATES = "CRATES",
+//     BUNCHES = "BUNCHES",
+//     PIECES = "PIECES",
+//     OTHER = "OTHER"
+//   }
+export enum ProductType {
+  CEREAL = "CEREAL",
+  FRUIT = "FRUIT",
+  VEGETABLE = "VEGETABLE",
+  LEGUME = "LEGUME",
+  TUBER = "TUBER",
+  HERB = "HERB",
+  SPICE = "SPICE",
+  NUT_AND_SEED = "NUT_AND_SEED",
+  DAIRY = "DAIRY",
+  LIVESTOCK = "LIVESTOCK",
+  POULTRY = "POULTRY",
+  AQUACULTURE = "AQUACULTURE",
+  HONEY_AND_BEE = "HONEY_AND_BEE",
+  FLOWER_AND_ORNAMENTAL = "FLOWER_AND_ORNAMENTAL",
+  ANIMAL_FEED = "ANIMAL_FEED",
+  AGROCHEMICAL = "AGROCHEMICAL",
+  FARM_TOOL_EQUIPMENT = "FARM_TOOL_EQUIPMENT",
+  PROCESSED_FOOD = "PROCESSED_FOOD",
+  BEVERAGE_CROP = "BEVERAGE_CROP",
+  FIBER_CROP = "FIBER_CROP",
+  OTHER = "OTHER"
+}
+export enum Unit {
+  KG = "KG",
+  LITERS = "LITERS",
+  BAGS = "BAGS",
+  CRATES = "CRATES",
+  BUNCHES = "BUNCHES",
+  PIECES = "PIECES",
+  ANIMALS = "ANIMALS",
+  PACKETS = "PACKETS",
+  TOOLS = "TOOLS",
+  OTHER = "OTHER"
+}
+  
   
   export enum ProductStatus {
     AVAILABLE = "AVAILABLE",
@@ -176,7 +212,7 @@ export const productsData = [
   {
     id: "cbe95a8b-a3e0-4a94-b5b1-6f1a70c16f8e",
     name: "Maize",
-    type: ProductType.GRAIN,
+    type: ProductType.CEREAL,
     unit: Unit.BAGS,
     priceperunit: 336,
     quantity: 71,
