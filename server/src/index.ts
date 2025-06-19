@@ -197,6 +197,7 @@ app.post('/product/farmer',checkAuth, upload.array('images', 5),async(req: Reque
         discount: parseFloat(values.discount),
         supplierthreshold: parseInt(values.supplierthreshold, 10),
         farmerdelivery: values.farmerdelivery === 'true',
+        servicedelivery:!(values.farmerdelivery==='true')
         
       };
         const myproducts = await prisma.product.create({  data: { ...productData, images:imageurls,farmerid:farmerid } });
@@ -447,9 +448,17 @@ app.patch('/product/farmer',checkAuth,upload.array('images', 5),async (req: Requ
       const changedFields = JSON.parse(req.body.changedFields);
 
       // Handle image uploads
-      const uploadedImageUrls = (req.files as Express.Multer.File[]).map(
-        (file) => `/uploads/${file.filename}`
-      );
+
+      const uploadedImageUrls:string[]=[];
+        const files = req.files as Express.Multer.File[];
+        for (const file of files) {
+          const filenameWithoutExt = file.filename.replace(path.extname(file.filename), '');
+
+          const outputWebPPath = await convertToWebP(file.path, filenameWithoutExt);
+
+          const relativeWebPPath = outputWebPPath.replace(/\\/g, '/').replace(/^.*\/uploads\//, '/uploads/');
+          uploadedImageUrls.push('/'+relativeWebPPath);
+        }
 
       // Combine new and existing images
       let finalImages: string[] = [];

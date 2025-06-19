@@ -152,7 +152,7 @@ async function handleSubmitReview() {
             <p><strong>Delivery Option:</strong> {order.deliveryoption}</p>
             <p><strong>Quantity: </strong>{order.totalcost/order.product.priceperunit} {order.product.unit}</p>
             <p><strong>Total Cost:</strong> KES {order.totalcost}</p>
-            <p><strong>Delivery:</strong> {order.deliveryoption}</p>
+            
             <p><strong>Order Date: </strong>{new Date(order.createdAt).toDateString()}</p>
             
 
@@ -174,7 +174,7 @@ async function handleSubmitReview() {
               ></div>
              
             </div>
-            {isfarmer&&(<>Please select your current status
+            {isfarmer &&order.tracking!==Tracking.DELIVERED&&(<>Please select your current status
             <div className="progress-button-container">
               {statuses.map((status, idx) => {
                 const isCompleted = idx < currentStep;
