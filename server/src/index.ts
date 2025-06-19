@@ -10,6 +10,8 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import MySQLStoreFactory from 'express-mysql-session';
 import upload,{convertToWebP} from "./imageupload";
 import path from "path";
+// import { setupDatabase } from "./resetRailwaydb";
+// setupDatabase();
 const router = express.Router();
 enum normaluser {
   buyer='buyer',
@@ -54,7 +56,7 @@ app.set('trust proxy', 1);
   user: 'root',
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME
- 
+  
 });
 let samesite;
 let secure;
@@ -283,7 +285,7 @@ app.delete("/logout", (req: Request, res: Response, next) => {
   });
 
 app.get("/auth-status", (req, res) => {res.set("Cache-Control", "no-store");
-  console.log('aauth status accessed')
+  console.log('auth status accessed')
   console.log(req.isAuthenticated())
 
   res.json({
@@ -340,6 +342,7 @@ const buildProductFilter = (input: {
 
 app.get('/home',async(req: Request, res: Response)=>{
     try{
+      
       const myproducts = await prisma.product.findMany({select:{type:true,location:true,name:true}});
       const types = [...new Set(myproducts.map(item => item.type))];
       const locations = [...new Set(myproducts.map(item => item.location))];
@@ -361,13 +364,11 @@ app.get('/product',async(req: Request, res: Response)=>{
     return}
 
     const isfarmer=(req.user as User).usertype===Role.farmer
-    console.log(isfarmer)
-    console.log(req.query)
+
     const userid=(req.user as User).id
     let myproducts=[]
     let result;
     if (req.query){
-      console.log('its here')
     const filters = buildProductFilter(req.query);
 
     myproducts = await prisma.product.findMany({
@@ -497,7 +498,6 @@ function toDeliveryType(value: string): DeliveryType | undefined {
     : undefined;
 }
 app.patch('/api/products/:id/remove-image', async (req, res) => {
-  console.log('im in remove image')
   const productId = req.params.id;
   const { image } = req.body;
 
@@ -634,7 +634,6 @@ app.get('/profile',checkAuth,async(req: Request, res: Response)=>{
         const myprofile = await (prisma as any)[usertype].
         findUnique({ where: { id: value },select:{firstname:true,lastname:true,email:true,phone:true}});
         res.json(myprofile);
-        console.log(myprofile)
 
         console.log('profile sent')
     }catch(error){
@@ -647,7 +646,6 @@ app.get('/profile',checkAuth,async(req: Request, res: Response)=>{
 app.patch('/profile',checkAuth,async(req: Request, res: Response)=>{
     try{
       const values=req.body
-      console.log(values)
         const userid=(req.user as User).id
         const usertype=(req.user as User).usertype
         const myprofile = await (prisma as any)[usertype].
@@ -696,7 +694,6 @@ app.post('/product/review',checkAuth,async(req: Request, res: Response)=>{
       if(existing){throw new Error('user has already reviewed this order!');}
       const myreview =await prisma.review.create({ data:{id:orderid,userId:value,rating:label as review_rating,
         comment:comment,productid:productid} })
-      console.log(myreview)
       res.json(myreview);
       
       console.log('review created')

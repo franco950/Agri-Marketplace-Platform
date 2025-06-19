@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-}
+} 
 
 model admin {
   id        String  @id @default(uuid())
@@ -147,6 +147,8 @@ enum review_rating {
   NINE
   TEN
 }
+
+
  enum product_type {
   CEREAL
   FRUIT 
