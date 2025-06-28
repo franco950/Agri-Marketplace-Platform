@@ -458,7 +458,7 @@ app.patch('/product/farmer',checkAuth,upload.array('images', 5),async (req: Requ
 
           const relativeWebPPath = outputWebPPath.replace(/\\/g, '/').replace(/^.*\/uploads\//, '/uploads/');
           uploadedImageUrls.push('/'+relativeWebPPath);
-        }
+        } 
 
       // Combine new and existing images
       let finalImages: string[] = [];
