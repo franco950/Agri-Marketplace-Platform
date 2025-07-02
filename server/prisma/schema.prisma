@@ -91,6 +91,32 @@ model product {
   @@index([farmerid], map: "Product_farmerid_fkey")
 }
 
+model chatbotMessage {
+  id         String   @id @default(uuid())
+  userId     String
+  prompt     String
+ response String @db.LongText
+  createdAt  DateTime @default(now())
+  user       user    @relation(fields: [userId], references: [id])
+}
+
+model message {
+  id          String   @id @default(uuid())
+  senderId    String
+  receiverId  String
+  content     String
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false)
+
+  sender      user     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver    user     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  @@index([receiverId])
+  @@index([senderId])
+  @@index([senderId, receiverId])
+}
+
+
 model review {
   id        String        @id @default(uuid())
   userId    String
@@ -119,6 +145,12 @@ model user {
   usertype  user_usertype
   id        String        @unique(map: "User_id_key")
   order     myorder[]
+
+  sentMessage message[] @relation("SentMessages")
+
+  receivedMessage message[] @relation("ReceivedMessages")
+
+  ChatMessage chatbotMessage[]
 }
 
 model worker {

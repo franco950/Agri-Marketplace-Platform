@@ -1,6 +1,7 @@
 import { useAuth } from "./context/useauth";
 import { useCartContext } from "./cart";
 import { useNavigate, Link} from "react-router-dom";
+import Chatbot from "./chatbot";
 const url=import.meta.env.VITE_SERVER_URL
 export default function Navbar() {
   let { isLoggedin, logout ,username, userRole} = useAuth();
@@ -13,6 +14,7 @@ export default function Navbar() {
       <ul className="nav-links">
         <li className="text-role" >{username}: {userRole&& userRole}</li>
         <li className="text"><Link to="/">Home</Link></li>
+        <Chatbot />
       
        
       {(userRole=='farmer')?(
@@ -26,6 +28,7 @@ export default function Navbar() {
         <img className='cart-image'src={url+'/uploads/cart.png'}></img></div></li>}
         <li className="text"><Link to="/profile">Profile</Link></li>
         <li className="text"><Link to='/tracking/1'>Orders</Link></li>
+        <li className="text"><Link to='/Chat'>Chat</Link></li>
         <li><button onClick={logout}>Logout</button></li></>
         
       ) : (

@@ -10,8 +10,10 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import MySQLStoreFactory from 'express-mysql-session';
 import upload,{convertToWebP} from "./imageupload";
 import path from "path";
+import http from "http";
+import { Server } from "socket.io";
 // import { setupDatabase } from "./resetRailwaydb";
-// setupDatabase();
+// setupDatabase(); 
 const router = express.Router();
 enum normaluser {
   buyer='buyer',
@@ -160,21 +162,8 @@ async function finduserRole(userId:string){
   if (myuser){return myuser.usertype}
   
 }
-//for debugging
-// console.log('cors')
-// app.get("/cors-test", (req, res) => {
 
-//   res.json({ message: "CORS works!" });
-// });
-// app.get("/session-debug", (req, res) => {
-  
-//     console.log(' session-debug')
-//     console.log(res)
-//   res.json({
-//     session: req.session,
-//     user: req.user
-//   });
-// });
+
 app.post('/product/farmer',checkAuth, upload.array('images', 5),async(req: Request, res: Response)=>{
     try{
 
@@ -211,6 +200,7 @@ app.post('/product/farmer',checkAuth, upload.array('images', 5),async(req: Reque
     }
 });
 app.use(express.json({ limit: '10mb' }));
+
 console.log('login')
 app.post("/login",notAuth, (req: Request, res: Response,next) => {
   passport.authenticate('local',(err:any, user:any) => {
@@ -711,6 +701,218 @@ app.post('/product/review',checkAuth,async(req: Request, res: Response)=>{
       res.status(500).json({message:"Internal server error"});}
  
 });
+app.post("/chatbot/ask",checkAuth, async (req, res) => {
+  const prompt  = req.body; // userId optional
+  const userId=(req.user as User).id
+
+  try {
+    const response = await fetch("http://localhost:11434/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "tinyllama",
+        prompt:prompt.prompt,
+        stream: false,
+      }),
+    });
+
+    const data = await response.json();
+    console.log(data)
+
+    // Store in DB
+    await prisma.chatbotMessage.create({
+  data: {
+    prompt: prompt.prompt, // Only the user's question
+    response: data.response,
+    userId: userId 
+  },
+});
+    res.json({ response: data.response });
+  } catch (err) {
+    console.error("Chatbot error:", err);
+    res.status(500).json({ error: "Failed to generate response" });
+  }
+});
+
+// GET all chatbot messages for a given user 
+app.get("/ChatbotMessages",checkAuth, async (req, res) => {
+  const userId=(req.user as User).id
+
+  if (!userId) {
+   res.status(400).json({ error: "User ID is required" }); return 
+  }
+
+  try {
+    const messages = await prisma.chatbotMessage.findMany({
+      where: {
+        userId:userId
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+
+    res.json(messages);
+  } catch (err) {
+    console.error("Error fetching chatbot messages:", err);
+    res.status(500).json({ error: "Failed to fetch chatbot messages" });
+  }
+});
+
+// GET all messages for a given user (sent OR received)
+app.get("/messages",checkAuth, async (req, res) => {
+  const userId=(req.user as User).id
+
+  if (!userId) {
+   res.status(400).json({ error: "User ID is required" }); return 
+  }
+
+  try {
+    const messages = await prisma.message.findMany({
+      where: {
+        OR: [
+          { senderId: userId },
+          { receiverId: userId },
+        ],
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+
+    res.json(messages);
+  } catch (err) {
+    console.error("Error fetching messages:", err);
+    res.status(500).json({ error: "Failed to fetch messages" });
+  }
+});
+
+// Get messages between two users
+app.post("/getMessages",checkAuth, async (req, res) => {
+  const user1=(req.user as User).id
+  const user2 = req.query.user2 as string;
+
+
+  if (!user1 || !user2) {
+    res.status(400).json({ error: 'Both user1 and user2 are required' }); return
+  }
+
+  const messages = await prisma.message.findMany({
+    where: {
+      OR: [
+        { senderId: user1 , receiverId: user2},
+        { senderId: user2 , receiverId: user1 },
+      ],
+    },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  res.json(messages);
+});
+
+
+// Mark a message as read
+app.patch('/messages/read',checkAuth, async (req, res) => {
+  const userId=(req.user as User).id
+
+  const updated =await prisma.message.updateMany({
+  where: { receiverId: userId, read: false },
+  data: { read: true },
+});
+  res.json(updated);
+});
+
+// Get unread message count
+app.get('/messages/unread',checkAuth, async (req, res) => {
+  const userId=(req.user as User).id
+
+  const count = await prisma.message.count({
+    where: {
+      receiverId: userId,
+      read: false,
+    },
+  });
+
+  res.json({ unreadCount: count });
+});
+app.post("/chatHeaders", checkAuth, async (req, res) => {
+  const userId = (req.user as User).id;
+
+  try {
+    // Get all user IDs they've chatted with
+    const sentTo = await prisma.message.findMany({
+      where: { senderId: userId },
+      select: { receiverId: true },
+      distinct: ["receiverId"],
+    });
+
+    const receivedFrom = await prisma.message.findMany({
+      where: { receiverId: userId },
+      select: { senderId: true },
+      distinct: ["senderId"],
+    });
+
+    // Merge and deduplicate
+    const userIds = Array.from(
+      new Set([
+        ...sentTo.map((msg) => msg.receiverId),
+        ...receivedFrom.map((msg) => msg.senderId),
+      ])
+    );
+
+    // Get user details
+    const users = await prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: { id: true, firstname: true },
+    });
+
+    res.json(users);
+  } catch (error) {
+    console.error("Failed to fetch chat users:", error);
+    res.status(500).json({ error: "Failed to load chat users" });
+  }
+});
+
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*", // or specify your frontend origin
+    methods: ["GET", "POST"],
+  },
+});
+
+
+// Socket.IO logic
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  // Join a personal room (user ID)
+  socket.on("join", (userId: string) => {
+    socket.join(userId);
+    console.log(`User ${userId} joined their room`);
+  });
+
+  // Handle sending a message
+ socket.on("send_message", async ({ senderId, receiverId, content }) => {
+  try {
+    const message = await prisma.message.create({
+      data: { senderId, receiverId, content },
+    });
+    io.to(receiverId).emit("receive_message", message);
+    io.to(senderId).emit("receive_message", message);
+  } catch (err) {
+    console.error("Error saving message:", err);
+    socket.emit("error_message", { error: "Message not saved" });
+  }
+});
+
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
+
+////////////////////////////////////////////////////////////end
 console.log("Registered routes:");
 app._router.stack.forEach((r:any) => {
   if (r.route) {
@@ -718,6 +920,7 @@ app._router.stack.forEach((r:any) => {
   }
 });
 app.use('/uploads', express.static('uploads'));
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port:${PORT}`);
 });
+

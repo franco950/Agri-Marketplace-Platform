@@ -12,6 +12,8 @@ import ProductDetail from './productdetails';
 import { CartProvider } from './cart'
 import FarmerDetailPage from './farmerproduct';
 import NewProductPage from './newproductpage';
+import Chat from './chat';
+import AppMessaging from './appmessaging';
 
 function App(){
   
@@ -26,6 +28,8 @@ function App(){
         <Route path="/register" element={<RegistrationPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/product" element={<ProtectedRoute><ProductPage /></ProtectedRoute>} />
+        <Route path="/chat" element={<ProtectedRoute><Chat/></ProtectedRoute>} />
+        <Route path="/AppMessaging" element={<ProtectedRoute><AppMessaging/></ProtectedRoute>} />
          <Route path="/product/farmer" element={<ProtectedRoute><ProductPage /></ProtectedRoute>} />
         <Route path="/productdetails" element={<ProtectedRoute><ProductDetail /></ProtectedRoute>} />
         <Route path="/productdetails/farmer" element={<ProtectedRoute><FarmerDetailPage /></ProtectedRoute>} />

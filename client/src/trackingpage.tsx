@@ -5,6 +5,7 @@ import { useMutation, useQueryClient,useQuery } from '@tanstack/react-query';
 import Navbar from './Navbar';
 import { Tracking,Order,Role } from './data';
 import { useState} from 'react';
+import { Link } from 'react-router-dom';
 
 enum status{
   pending='pending',
@@ -154,6 +155,13 @@ async function handleSubmitReview() {
             <p><strong>Total Cost:</strong> KES {order.totalcost}</p>
             
             <p><strong>Order Date: </strong>{new Date(order.createdAt).toDateString()}</p>
+            <Link 
+              to="/AppMessaging" 
+              state={{  otherUserId: (isfarmer&&order.user.id)||order.farmer.id}}
+            >
+              <button>Message</button>
+            </Link>
+
             
 
             <div className="progress-labels-container">
