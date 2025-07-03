@@ -15,8 +15,8 @@ import { Server } from "socket.io";
 import { ReplyTogetherAI } from "./togetherAI";
 import { ReplyOpenrouter } from "./openrouter";
 import { ReplyOllama } from "./ollama";
-import { setupDatabase } from "./resetRailwaydb";
-setupDatabase(); 
+// import { setupDatabase } from "./resetRailwaydb";
+// setupDatabase(); 
 const router = express.Router();
 enum normaluser {
   buyer='buyer',
