@@ -35,12 +35,13 @@ useEffect(() => {
 
   const fetchMessages = async () => {
     try {
-      const res = await fetch(`${url}/getMesssages?user2=${effectiveUserId}`, {
+      const res = await fetch(`${url}/getMessages?user2=${effectiveUserId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
       const data = await res.json();
+      console.log(data)
       setMessages(data);
     } catch (err) {
       console.error("Failed to fetch messages:", err);

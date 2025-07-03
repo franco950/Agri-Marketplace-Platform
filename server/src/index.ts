@@ -12,6 +12,9 @@ import upload,{convertToWebP} from "./imageupload";
 import path from "path";
 import http from "http";
 import { Server } from "socket.io";
+import { ReplyTogetherAI } from "./togetherAI";
+import { ReplyOpenrouter } from "./openrouter";
+import { ReplyOllama } from "./ollama";
 // import { setupDatabase } from "./resetRailwaydb";
 // setupDatabase(); 
 const router = express.Router();
@@ -701,33 +704,26 @@ app.post('/product/review',checkAuth,async(req: Request, res: Response)=>{
       res.status(500).json({message:"Internal server error"});}
  
 });
+
 app.post("/chatbot/ask",checkAuth, async (req, res) => {
   const prompt  = req.body; // userId optional
   const userId=(req.user as User).id
+  const input=prompt.prompt
 
   try {
-    const response = await fetch("http://localhost:11434/api/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "tinyllama",
-        prompt:prompt.prompt,
-        stream: false,
-      }),
-    });
-
-    const data = await response.json();
-    console.log(data)
+    const answer=await ReplyTogetherAI(input)
+    const output=answer.reply
+    const model=answer.model
 
     // Store in DB
     await prisma.chatbotMessage.create({
   data: {
-    prompt: prompt.prompt, // Only the user's question
-    response: data.response,
+    prompt: input, 
+    response: model+output,
     userId: userId 
   },
 });
-    res.json({ response: data.response });
+    res.json({ response: output });
   } catch (err) {
     console.error("Chatbot error:", err);
     res.status(500).json({ error: "Failed to generate response" });
@@ -782,15 +778,17 @@ app.get("/messages",checkAuth, async (req, res) => {
 
     res.json(messages);
   } catch (err) {
-    console.error("Error fetching messages:", err);
+    console.error("Error fetching messages:", err); 
     res.status(500).json({ error: "Failed to fetch messages" });
   }
 });
 
 // Get messages between two users
 app.post("/getMessages",checkAuth, async (req, res) => {
+  
   const user1=(req.user as User).id
   const user2 = req.query.user2 as string;
+ 
 
 
   if (!user1 || !user2) {

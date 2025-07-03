@@ -1,6 +1,19 @@
 import  { useState, useRef, useEffect } from "react";
 import "./chatbot.css"; 
 const url=import.meta.env.VITE_SERVER_URL
+function extractUserMessage(rawResponse: string): string {
+  if (!rawResponse) return "";
+
+  // Remove the <think>...</think> section (including the tags themselves)
+  const withoutThink = rawResponse.replace(/<think>[\s\S]*?<\/think>/i, "");
+
+  // Optional: remove leading 🤖 emoji and extra whitespace
+  const cleaned = withoutThink.replace(/^\s*🤖\s*/, "").trim();
+
+  return cleaned;
+}
+
+
 export default function Chatbot() {
   const [visible, setVisible] = useState(false);
   const [messages, setMessages] = useState<{ text: string; sender: "user" | "bot" }[]>([]);
@@ -9,6 +22,7 @@ export default function Chatbot() {
   const [position, setPosition] = useState({ x: window.innerWidth - 80, y: window.innerHeight - 80 });
 const [isDragging, setIsDragging] = useState(false);
 const [wasDragged, setWasDragged] = useState(false);
+
 
 const handleTouchStart = (e: React.TouchEvent) => {
   const touch = e.touches[0];
@@ -88,9 +102,12 @@ const startDrag = (e: React.MouseEvent) => {
       });
 
       const data = await res.json();
+      const response = data.response
+      const formatted=extractUserMessage(response)
+
 
       const botMessage = {
-        text: `🤖 ${data.response}`,
+        text: `🤖 ${formatted}`,
         sender: "bot" as const,
       };
 
@@ -138,7 +155,7 @@ const startDrag = (e: React.MouseEvent) => {
       {visible && (
         <div className="chat-box">
           <div className="chat-header">
-            <h3>AgriBot (Phi-3 Mini)</h3>
+            <h3>AgriBot</h3>
             <span className="close-btn" onClick={toggleChat}>
               ×
             </span>
