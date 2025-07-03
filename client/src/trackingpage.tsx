@@ -156,7 +156,7 @@ async function handleSubmitReview() {
             
             <p><strong>Order Date: </strong>{new Date(order.createdAt).toDateString()}</p>
             <Link 
-              to="/AppMessaging" 
+              to="/Chat" 
               state={{  otherUserId: (isfarmer&&order.user.id)||order.farmer.id}}
             >
               <button>Message</button>

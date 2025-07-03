@@ -4,6 +4,7 @@ import AppMessaging from "./appmessaging";
 import "./chat.css";
 import { useAuth } from "./context/useauth";
 import Navbar from "./Navbar";
+import { useLocation } from "react-router-dom";
 const url=import.meta.env.VITE_SERVER_URL
 
 interface User {
@@ -12,7 +13,9 @@ interface User {
 }
 
 export default function Chat() {
-     
+  const location = useLocation();
+ const newchatuserid=(location.state as { otherUserId?: string })?.otherUserId;
+ console.log(newchatuserid)
  const userid=useAuth()
  const currentUserId=userid
   const [chats, setChats] = useState<User[]>([]);
@@ -36,7 +39,7 @@ export default function Chat() {
     <div className="chat-wrapper">
       <div className="chat-list">
         <h3>Your Chats</h3>
-        {chats.map((user) => (
+        {chats.length>0&&chats.map((user) => (
           <div
             key={user.id}
             className={`chat-user ${activeChatUser?.id === user.id ? "active" : ""}`}
@@ -48,15 +51,14 @@ export default function Chat() {
       </div>
 
       <div className="chat-window">
-        {activeChatUser ? (
+        {(newchatuserid || activeChatUser) ? (
           <AppMessaging
-            
-            otherUserId={activeChatUser.id}
-            
+            otherUserId={newchatuserid || activeChatUser?.id}
           />
         ) : (
           <p className="placeholder">Select a chat to start messaging</p>
         )}
+
       </div>
     </div>
     </div>

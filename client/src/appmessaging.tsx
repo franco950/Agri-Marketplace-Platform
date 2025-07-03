@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import "./appmessaging.css";
 import { socket } from "./socket"; 
 import { useAuth } from "./context/useauth";
-import { useLocation } from "react-router-dom";
 const url=import.meta.env.VITE_SERVER_URL
 
 interface Message {
@@ -21,10 +20,8 @@ interface AppMessagingProps {
 }
 
 export default function AppMessaging({ otherUserId }: AppMessagingProps){
-  const location = useLocation();
-   const effectiveUserId = 
-    otherUserId || 
-    (location.state as { otherUserId?: string })?.otherUserId;
+  
+   const effectiveUserId = otherUserId 
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const {userid}=useAuth()
